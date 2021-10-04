@@ -1,0 +1,43 @@
+Package: bcEpiRate
+Title: Tools for Standardized Rates in Population Health Surveillance and Epidemiology
+Version: 0.0.1
+Authors@R: 
+    c(person(given = "Reiko",
+             family = "Okamoto",
+             role = c("aut", "cre"),
+             email = "Reiko.Okamoto@gov.bc.ca"),
+      person(given = "Henry",
+             family = "Ngo",
+             role = "aut",
+             email = "Henry.Ngo@gov.bc.ca"),
+      person(given = "Ioana",
+             family = "Sevcenco",
+             role = "aut",
+             email = "Ioana.Sevcenco@gov.bc.ca"),
+      person(given = "Province of British Columbia",
+             role = "cph"))
+Description: This package contains functions for analyzing data in the areas of population health surveillance and epidemiology. Currently, it allows users to calculate specific rates, directly and indirectly standardized rates, and construct confidence intervals. This package is inspired by the R package dsr (no longer available on CRAN) and the SAS/STAT STDRATE procedure.
+License: Apache License (== 2.0) | file LICENSE
+URL: https://github.com/bcgov/bcEpiRate 
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+Imports: 
+    data.table,
+    dplyr,
+    magrittr,
+    plyr,
+    purrr,
+    rlang,
+    withr,
+    stats,
+    stringr,
+    tibble
+Depends: 
+    R (>= 2.10)

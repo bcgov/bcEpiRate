@@ -1,0 +1,415 @@
+---
+title: "bcEpiRate"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bcEpiRate}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## 🔎 Purpose
+
+In population health surveillance and epidemiology, we often want to
+measure events of interest (e.g., new cases of a disease, doctor's
+visits, hospitalizations) and express them as rates, i.e., the number of
+occurrences in a population of a given size. We also often want to
+compare these rates across different populations, which may vary in size
+and/or demographic composition. These comparisons can be made using
+standardization. The `bcEpiRate` package is designed to help users with
+these calculations. The aim of this vignette is to demonstrate how to
+use the different functions that make up this package.
+
+## 📦 Load packages
+
+Let's begin by loading the necessary packages:
+
+```{r setup, message = FALSE}
+library(bcEpiRate)
+library(dplyr)
+```
+
+This package plays nicely with [`dplyr`](https://dplyr.tidyverse.org/)
+functions. In particular, we will be using `group_by()`, `mutate()`, and
+`summarise()` frequently in this vignette.
+
+## 📁 Built-in data sets
+
+We will use the following built-in data sets to explore this package:
+`counts` , `population`, `std_population`, and `death_rates`.
+
+`counts` contains *simulated* number of deaths by year, cause of death,
+and demographic characteristics (i.e., age group and sex).
+
+```{r show-counts}
+head(counts)
+```
+
+`population` contains the number of people in the *simulated* study
+population by year and demographic characteristics.
+
+```{r show-population}
+head(population)
+```
+
+`std_population` contains the number of people in the *simulated*
+standard population by demographic characteristics. These numbers act as
+weights that can be used to calculate age- and sex-adjusted statistics.
+
+```{r show-std-population}
+head(std_population)
+```
+
+The final data set, `death_rates` contains *simulated* age-specific
+mortality rates for different causes of death.
+
+```{r show-death-rates}
+head(death_rates)
+```
+
+In practice, we often source these data sets from different sources
+(e.g., Statistics Canada, BC Stats, ministry data warehouse).
+
+We are now ready to start calculating rates and ratios.
+
+## Example 1: Calculating age-specific mortality rates for Disease A in 2018
+
+The **age-specific mortality rate** is calculated by dividing the number
+of deaths in a particular age group by the number of people in that age
+group in the population (1).
+
+Let's calculate age-specific mortality rates for Disease A in 2018.
+First, we will wrangle the built-in data frames:
+
+```{r example-01-wrangle}
+# filter number of deaths by disease and year of interest
+counts_01 <- counts %>%
+  filter(disease == "Disease A", year == 2018) %>%
+  group_by(age_group) %>% # aggregate number of deaths by age group
+  summarise(counts = sum(counts), .groups = "drop")
+
+# filter study population size by year of interest
+popn_01 <- population %>%
+  filter(year == 2018) %>%
+  group_by(age_group) %>% # aggregate population count by age group
+  summarise(popn = sum(popn), .groups = "drop")
+ 
+# join data frames on age group
+df_01 <- counts_01 %>%
+  left_join(popn_01, by = "age_group")
+head(df_01)
+```
+
+We will use `get_spec_rt()` to add the age-specific mortality rates (per
+100,000 population) as a new column in the data frame:
+
+```{r example-01-get-spec-rt}
+df_01 %>%
+  mutate(age_spec_rt_per_100k = get_spec_rt(counts = counts, popn = popn, scale = 100000)) %>%
+  head()
+```
+
+Arguments can also be provided separately as vectors:
+
+```{r example-01-get-spec-rt-02}
+age_spec_rt_per_100k <- get_spec_rt(counts = df_01$counts, popn = df_01$popn, scale = 100000)
+age_spec_rt_per_100k
+```
+
+**Note**: `get_spec_rt()` assumes that the values of the input arguments
+`counts` and `popn` are aligned. For example, if the number of deaths
+observed in the 0-4 age group appears first in the vector passed into
+`counts`, the number of people in this age group must appear first in
+`popn`. This logic applies to the other functions in this package.
+
+## Example 2: Calculating sex-specific mortality rates for Disease A in 2018
+
+We can also calculate mortality rates for a specific sex.
+
+Let's calculate sex-specific mortality rates for Disease A in 2018.
+Again, we will first wrangle the data frames:
+
+```{r example-02-wrangle}
+# filter number of deaths by disease and year of interest
+counts_02 <- counts %>%
+  filter(disease == "Disease A", year == 2018) %>%
+  group_by(sex) %>% # aggregate number of deaths by sex
+  summarise(counts = sum(counts), .groups = "drop")
+
+# filter population size by year of interest
+popn_02 <- population %>%
+  filter(year == 2018) %>%
+  group_by(sex) %>% # aggregate population count by sex
+  summarise(popn = sum(popn), .groups = "drop")
+
+# join data frames on sex
+df_02 <- counts_02 %>%
+  left_join(popn_02, by = "sex")
+df_02
+```
+
+Use `get_spec_rt()` to calculate the sex-specific mortality rates (per
+100,000 population) and construct 95% confidence intervals based on the
+Normal distribution.
+
+```{r example-02-get-spec-rt, message = FALSE}
+df_02 <- df_02 %>%
+  mutate(get_spec_rt(counts = counts, popn = popn, scale = 100000, dist = "normal", interval = 0.95))
+df_02
+```
+
+```{r example-02-text, include=FALSE}
+# store all values for summary
+df_02 <- df_02 %>%
+  mutate(across(.cols = c(counts, popn), ~ format(.x, big.mark = ",")),
+         across(.cols = c(rate, lower, upper), ~ round(.x, 1)))
+df_02_f <- df_02 %>% filter(sex == "F")
+df_02_m <- df_02 %>% filter(sex == "M")
+```
+
+The `rate` column contains the estimate of the specific rate and the
+`lower` and `upper` columns contain the confidence limits. For females,
+`r df_02_f$counts` deaths were observed in a population of
+`r df_02_f$popn`. This corresponds to a sex-specific mortality rate of
+`r df_02_f$rate` per 100,000 population; 95% CI [`r df_02_f$lower`,
+`r df_02_f$upper`]. In comparison, for males, `r df_02_m$counts` deaths
+were observed in a population of `r df_02_m$popn`. This corresponds to a
+rate of `r df_02_m$rate` per 100,000 population; 95% CI
+[`r df_02_m$lower`, `r df_02_m$upper`].
+
+## Example 3: Calculating the crude mortality rate for Disease B in 2019
+
+The **crude mortality rate** is calculated by dividing the total number
+of deaths by the total number of people in a population (2).
+
+In addition to specific rates, `get_spec_rt()` can be used to calculate
+crude rates, provided `counts` and `popn` are scalars (i.e., single
+integer values) which represent the total number of deaths and the size
+of the population respectively.
+
+Let's calculate the crude mortality rate (per 100,000) for Disease B in
+2019:
+
+```{r example-03}
+# total number of deaths caused by Disease B in 2019
+counts_03 <- counts %>%
+  filter(disease == "Disease B", year == 2019) %>%
+  summarise(counts = sum(counts)) %>%
+  pull(counts) 
+
+# size of the population in 2019
+popn_03 <- population %>%
+  filter(year == 2019) %>%
+  summarise(popn = sum(popn)) %>%
+  pull(popn)
+
+df_03 <- data.frame(counts = counts_03, popn = popn_03) %>%
+  mutate(get_spec_rt(counts = counts, popn = popn, scale = 100000, dist = "normal", interval = 0.95))
+df_03
+```
+
+```{r example-03-text, include=FALSE}
+# store all values for summary
+df_03 <- df_03 %>%
+  mutate(across(.cols = c(counts, popn), ~ format(.x, big.mark = ",")),
+         across(.cols = c(rate, lower, upper), ~ round(.x, 1)))
+
+```
+
+In 2019, `r df_03$counts` deaths from Disease B were reported in a
+population of `r df_03$popn`. This corresponds to a crude mortality rate
+of `r df_03$rate` per 100,000 population; 95% CI [`r df_03$lower`,
+`r df_03$upper`].
+
+## Example 4: Calculating the age-standardized mortality rate for Disease C in 2019
+
+The **age-standardized mortality rate** is a weighted average of the
+age-specific mortality rates, where the weights are derived from the age
+structure of the standard population (3). This procedure is also
+referred to as **direct standardization**.
+
+Statistics Canada provides an example as to why it is important to use
+standardized rates when comparing different populations (4):
+
+> [The] 2011 Canadian population has a higher proportion of those 40+
+> than the 2000 population does: almost half (49.9%) of the 2011
+> population was 40 years of age or older, compared to 44.4% in 2000.
+> Due to the high mortality rate in the 40+ age group, considerably more
+> cancer deaths are observed in 2011. But, it is only by removing the
+> effect of the differing age distributions that we can make conclusions
+> about the relative decreases or increases in mortality over time.
+
+Let's calculate the age-standardized mortality rate for Disease C in
+2019. We will first wrangle `counts`, `population`, and
+`std_population`:
+
+```{r example-04-wrangle}
+# filter number of deaths by disease and year of interest
+counts_04 <- counts %>%
+  filter(disease == "Disease C", year == 2019) %>%
+  group_by(age_group) %>% # aggregate number of deaths by age group
+  summarise(counts = sum(counts), .groups = "drop")
+  
+# filter *study* population size by year of interest
+popn_04 <- population %>%
+  filter(year == 2019) %>%
+  group_by(age_group) %>% # aggregate population count by age group
+  summarise(popn = sum(popn), .groups = "drop")
+
+# wrangle *standard* population
+std_popn_04 <- std_population %>%
+  group_by(age_group) %>% # aggregate population count by age group
+  summarise(std_popn = sum(std_popn), .groups = "drop")
+
+# join data frames on age group
+df_04 <- counts_04 %>%
+  left_join(popn_04, by = "age_group") %>%
+  left_join(std_popn_04, by = "age_group")
+head(df_04)
+```
+
+Each row contains the number of deaths from Disease C, the number of
+people in the study population, and the number of people in the standard
+population for a particular age group.
+
+Next, we can use `get_ds_rt()` to calculate the age-standardized
+mortality rate. We will also construct a 95% confidence interval around
+the estimate:
+
+```{r example-04-get-ds-rt}
+df_04 <- df_04 %>%
+  summarise(get_ds_rt(
+    counts = counts, popn = popn, std_popn = std_popn,
+    scale = 100000, dist = "normal", interval = 0.95
+  ))
+df_04
+```
+
+```{r example-04-text, include=FALSE}
+# store all values for summary
+df_04 <- df_04 %>%
+  mutate(across(.cols = c(dsr, lower, upper), ~ round(.x, 1)))
+df_04
+```
+
+The age-standardized mortality rate for Disease C in 2019 was
+`r df_04$dsr` per 100,000 population; 95% CI [`r df_04$lower`,
+`r df_04$upper`].
+
+## Example 5: Calculating multiple age-standardized mortality rates at once
+
+We often want to calculate age-standardized mortality rates for multiple
+diseases over the years. We will explore how to do this using
+`get_ds_rt()` and `dplyr` functions.
+
+First, let's wrangle `counts`, `population`, and `std_population`:
+
+```{r example-05-wrangle}
+# aggregate number of deaths by year, cause of death, and age group
+counts_05 <- counts %>%
+  group_by(year, disease, age_group) %>%
+  summarise(counts = sum(counts), .groups = "drop")
+
+# aggregate *study* population size by year and age group
+popn_05 <- population %>%
+  group_by(year, age_group) %>%
+  summarise(popn = sum(popn), .groups = "drop")
+
+# aggregate *standard* population size by age group
+std_popn_05 <- std_population %>%
+  group_by(age_group) %>%
+  summarise(std_popn = sum(std_popn), .groups = "drop")
+
+# join data frames
+df_05 <- counts_05 %>%
+  left_join(popn_05, by = c("year", "age_group")) %>%
+  left_join(std_popn_05, by = "age_group")
+head(df_05)
+```
+
+To calculate age-standardized mortality rates for all combinations of
+`year` and `disease`, we call `group_by()` followed by `summarise()`
+along with `get_ds_rt()`. Let's construct 95% confidence intervals
+around each estimate as well:
+
+```{r example-05-get-ds-rt}
+df_05 <- df_05 %>%
+  group_by(year, disease) %>%
+  summarise(get_ds_rt(
+    counts = counts, popn = popn, std_popn = std_popn,
+    scale = 100000, dist = "normal", interval = 0.95
+  ), .groups = "drop")
+df_05
+```
+
+In just a few lines of code, we have calculated age-standardized
+mortality rates (per 100,000 population) along with their confidence
+intervals for 5 different causes of death over 5 years.
+
+## Example 6: Calculating the standard mortality ratio for Disease D in 2016
+
+The **standard mortality ratio (SMR)** is a ratio between the number of
+observed deaths in the study population and the number of expected
+deaths in the standard population. When the ratio is greater than 1, it
+suggests that there is excess mortality in the study population. On the
+other hand, when it is less than 1, it suggests that the number of
+deaths in the study population is fewer than what was expected (5).
+
+To calculate the SMR for Disease D in 2016, we will need the number of
+observed deaths, the size of each age group in the study population, and
+the age-specific mortality rate for each subgroup in the standard
+population. Let's say that 278 people died from Disease D in 2016:
+
+```{r example-06}
+# define number of observed deaths
+count_06 <- 278
+
+# filter study population size by year of interest
+popn_06 <- population %>%
+  filter(year == 2016) %>%
+  group_by(age_group) %>% # aggregate population count by age group
+  summarise(popn = sum(popn), .groups = "drop") %>%
+  pull(popn)
+
+# filter age-specific mortality rates by disease of interest
+std_rt_06 <- death_rates %>%
+  filter(disease == "Disease D") %>%
+  pull(std_rt)
+  
+# calculate SMR
+smr <- get_smr(count = count_06, popn = popn_06, std_rt = std_rt_06)
+smr
+```
+
+The number of deaths in the study is `r round(smr * 100, 1)`% of the
+number of expected deaths.
+
+The ability to construct confidence intervals will be available in the
+future.
+
+## 🤹 Exception handling
+
+`get_spec_rt()`, `get_ds_rt()`, and `get_smr()` are designed to handle
+edge cases. Access the documentation pages for more information by using
+either `help()` or `?`.
+
+## 📚 References
+
+1.  [Principles of Epidemiology \| Lesson 3 - Section
+    3](https://www.cdc.gov/csels/dsepd/ss1978/lesson3/section3.html)
+2.  [Crude and Age-Adjusted Rate \| Health & Senior
+    Services](https://health.mo.gov/data/documentation/crude-aarate.php)
+3.  [Age-standardized mortality rate (per 100 000
+    population)](https://www.who.int/data/gho/indicator-metadata-registry/imr-details/78)
+4.  [Age-standardized Rates](https://www.statcan.gc.ca/eng/dai/btd/asr)
+5.  [Standardized mortality ratio -
+    Wikipedia](https://en.wikipedia.org/wiki/Standardized_mortality_ratio)
