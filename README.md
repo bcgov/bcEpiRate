@@ -5,9 +5,10 @@
 [![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![R-CMD-check](https://github.com/bcgov/bcEpiRate/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov/bcEpiRate/actions)
+[![test-coverage](https://codecov.io/gh/bcgov/bcEpiRate/branch/main/graph/badge.svg)](https://codecov.io/gh/bcgov/bcEpiRate?branch=main)
+
 :toolbox: Tools for standardized rates in population health surveillance
 and epidemiology
-[![test-coverage](https://codecov.io/gh/bcgov/bcEpiRate/branch/main/graph/badge.svg)](https://codecov.io/gh/bcgov/bcEpiRate?branch=main)
 
 ### Features
 
