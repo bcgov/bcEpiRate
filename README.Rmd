@@ -4,8 +4,6 @@ output:
     variant: gfm
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -18,7 +16,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![R-CMD-check](https://github.com/bcgov-c/bcphser-analysis/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov-c/bcphser-analysis/actions)
+[![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![R-CMD-check](https://github.com/bcgov/bcEpiRate/workflows/R-CMD-check/badge.svg)](https://github.com/bcgov/bcEpiRate/actions) [![test-coverage](https://codecov.io/gh/bcgov/bcEpiRate/branch/main/graph/badge.svg)](https://codecov.io/gh/bcgov/bcEpiRate?branch=main)
 
 :toolbox: Tools for standardized rates in population health surveillance and epidemiology
 
@@ -51,7 +49,7 @@ remotes::install_github("bcgov/bcEpiRate", build_vignettes = TRUE)
 
 See the vignette for this package using:
 
-```{r vignette}
+```{r eval=FALSE}
 browseVignettes("bcEpiRate")
 ```
 
