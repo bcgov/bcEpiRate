@@ -1,3 +1,4 @@
+# define necessary arguments
 counts_a <- c(10, 7, 6, 4, 2) # unproblematic
 counts_b <- c(10, 7, 6, 4, NA) # contains NA STRATUM 5
 
@@ -17,7 +18,7 @@ test_that("directly standardized rate can be calculated when all arguments are v
 
 test_that("error is thrown when inputs are of varying lengths", {
   expect_error(
-    get_ds_rt(counts_a, popn_a, c(1:10)),
+    get_ds_rt(counts_a, popn_a, std_popn_a[1:4]),
     "input vectors must be the same length"
   )
 })
@@ -29,17 +30,17 @@ test_that("error is thrown when `std_popn` is not numeric", {
   )
 })
 
-test_that("warning is raised when NA is found in `std_popn`", {
-  expect_warning(
-    get_ds_rt(counts_a, popn_a, std_popn_c),
-    "at least one element in `std_popn` is NA"
-  )
-})
-
 test_that("warning is raised when 0 is found in `std_popn`", {
   expect_warning(
     get_ds_rt(counts_a, popn_a, std_popn_b),
     "at least one element in `std_popn` is 0"
+  )
+})
+
+test_that("warning is raised when NA is found in `std_popn`", {
+  expect_warning(
+    get_ds_rt(counts_a, popn_a, std_popn_c),
+    "at least one element in `std_popn` is NA"
   )
 })
 
@@ -248,6 +249,7 @@ test_that("expected counts are returned properly when `clean_strata` == zero", {
   )
 })
 
+# define more necessary arguments to test edge cases
 counts_c <- c(10, NA, 6, NA, 2) # contains NA in STRATUMS 2 AND 4
 popn_c <- c(NA, 595, NA, 43, NA) # contains NA in STRATUMS 2 AND 4
 
@@ -284,7 +286,7 @@ test_that("function throws an error when `dist` is supplied, but not `interval`,
   )
 })
 
-test_that("function throws a warning when the use of the normal distribution should be reconsidered", {
+test_that("function throws a warning to reconsider using normal distribution", {
   expect_warning(
     get_ds_rt(
       counts = c(1, 5, 10, 15, 30),
