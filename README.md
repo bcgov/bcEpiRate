@@ -81,9 +81,9 @@ to abide by its terms.
 
     To cite package 'bcEpiRate' in publications use:
 
-      Reiko Okamoto, Henry Ngo and Ioana Sevcenco (NA). bcEpiRate: Tools
+      Reiko Okamoto, Henry Ngo and Ioana Sevcenco (2021). bcEpiRate: Tools
       for Standardized Rates in Population Health Surveillance and
-      Epidemiology. R package version 0.0.1.
+      Epidemiology. R package version 0.1.0.
       https://github.com/bcgov/bcEpiRate
 
     A BibTeX entry for LaTeX users is
@@ -91,7 +91,8 @@ to abide by its terms.
       @Manual{,
         title = {bcEpiRate: Tools for Standardized Rates in Population Health Surveillance and Epidemiology},
         author = {Reiko Okamoto and Henry Ngo and Ioana Sevcenco},
-        note = {R package version 0.0.1},
+        year = {2021},
+        note = {R package version 0.1.0},
         url = {https://github.com/bcgov/bcEpiRate},
       }
 
