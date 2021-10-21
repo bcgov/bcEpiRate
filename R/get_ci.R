@@ -1,71 +1,50 @@
-#' Calculate a confidence interval
+#' Calculate a (log) normal distribution confidence interval
 #'
-#' @description Calculate a confidence interval given the estimate(s),
-#' the variance(s), the width of the interval, and the type of probability
-#' distribution to follow.
+#' @description Calculate a (log) normal distribution confidence interval
 #'
-#' @param dist A string to indicate the type of probability distribution
-#' to follow. Can be one of the following: `"normal"`, `"log normal"`, or `"poisson"`.
-#' This parameter is case insensitive.
-#' @param interval A scalar, between 0 and 1, indicating the width of the interval.
-#' For example, for a 95% confidence interval, use `interval = 0.95`.
-#' @param estimate A numeric vector containing the point estimates. When constructing
-#' a confidence interval using the Poisson distribution, `estimate` must be a (vector of)
-#' whole number(s). When the Poisson confidence interval is on a *rate*, `estimate` is the numerator.
-#' @param variance A numeric vector containing the variances. This parameter must
-#' be left empty when constructing a confidence interval for a Poisson distribution.
-#' @param denominator A numeric vector containing the denominator when constructing
-#' a Poisson confidence interval on a *rate*. Default value is
-#' `1` when `dist = "poisson"`. For other distributions, this parameter must be left empty.
+#' @param interval A scalar between 0 and 1, indicating the width of the interval.
+#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param estimate A numeric vector containing the point estimates.
+#' @param variance A numeric vector containing the variances.
+#' @param log A Boolean to indicate whether to use the log normal distribution.
+#' The default value is `FALSE`.
 #'
-#' @details This low-level function doesn't need to know what the point estimates
-#' represent (e.g. rate, ratio, etc.). It also assumes that the estimates and variances
-#' are provided in the same order.
+#' @details This function is used to calculate confidence intervals in
+#' [get_spec_rt()] and [get_ds_rt()].
 #'
-#' `estimate` and `variance`, when provided, must have the same length. If `denominator` is
-#' provided, its length must be 1 or equal to the length of `estimate`. If the length of
-#' `denominator` is 1, R's [recycling rules](http://www.r-tutor.com/r-introduction/vector/vector-arithmetics) apply.
+#' This function doesn't need to know which type of epidemiological measure has
+#' been passed to `estimate` (e.g., rate, risk). It also assumes that the values
+#' of the input arguments `estimate` and `variance` are aligned and the vectors
+#' are the same length.
 #'
-#' The Poisson distribution is implemented using the chi-squared distribution to allow for
-#' the continuous extension of integer variable (`estimate`).
-#'
-#' @return A data frame with 2 columns `upper` and `lower` which contain the upper
-#' and lower bounds of a confidence interval respectively.
+#' @return A data frame with columns `lower` and `upper` which contain the lower
+#' and upper limits of a confidence interval respectively.
 #'
 #' @examples
 #' \dontrun{
 #' # calculate a single confidence interval
-#' get_ci(dist = "normal", interval = 0.95, estimate = 10, variance = 4)
-#' get_ci(dist = "log normal", interval = 0.9, estimate = 10, variance = 4)
-#' get_ci(dist = "poisson", interval = 0.99, estimate = 30, denominator = 100)
+#' get_ci_norm(interval = 0.95, estimate = 10, variance = 4)
+#' get_ci_norm(interval = 0.9, estimate = 20, variance = 9, log = TRUE)
 #'
 #' # calculate multiple confidence intervals
-#' get_ci(dist = "normal", interval = 0.95, estimate = c(10, 20), variance = c(4, 9))
+#' get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9))
 #'
-#' # use a data frame to calculate confidence intervals
-#' estimate <- c(10, 20, 30)
-#' variance <- c(4, 9, 16)
-#' df <- data.frame(estimate, variance)
+#' # use columns of a data frame as inputs
+#' df <- data.frame(estimate = c(10, 20, 30), variance = c(4, 9, 16))
 #'
-#' get_ci(dist = "normal", interval = 0.95, df$estimate, df$variance)
+#' # using dplyr
+#' df %>%
+#'   dplyr::mutate(get_ci_norm(0.975, estimate, variance))
+#'
+#' # using base
+#' get_ci_norm(interval = 0.975, estimate = df$estimate, variance = df$variance)
 #' }
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci <- function(dist, interval, estimate, variance = NULL, denominator = NULL) {
-
+get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
   # check validity of inputs
-
-  if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) {
-    dist <- "normal"
-  } else if (stringr::str_detect(dist, stringr::regex("^log(-|\\s)?normal$", ignore_case = TRUE))) {
-    dist <- "log normal"
-  } else if (stringr::str_detect(dist, stringr::regex("^poisson$", ignore_case = TRUE))) {
-    dist <- "poisson"
-  } else {
-    stop("`dist` must be one of 'normal', 'log normal', or 'poisson'")
-  }
 
   if (!is.numeric(interval)) {
     stop("`interval` must be numeric")
@@ -83,61 +62,33 @@ get_ci <- function(dist, interval, estimate, variance = NULL, denominator = NULL
     stop("`estimate` must be numeric")
   }
 
-  if (dist == "poisson") {
-    if (!all(estimate %% 1 == 0, na.rm = TRUE)) {
-      stop("`estimate must be an integer if `dist` is 'poisson'")
-    }
-
-    if (!is.null(variance)) {
-      stop("`variance` must be left empty when `dist` is 'poisson'")
-    }
-
-    if (is.null(denominator)) {
-      denominator <- 1
-    }
-  } else { # normal, log normal
-
-    if (is.null(variance)) {
-      stop("`variance` is required to construct a confidence interval unless `dist` is 'poisson'")
-    }
-
-    if (!is.numeric(variance)) {
-      stop("`variance` must be numeric")
-    }
-
-    if (!all(variance >= 0, na.rm = TRUE)) {
-      stop("`variance` must be greater than or equal to 0")
-    }
-
-    if (length(estimate) != length(variance)) {
-      stop("length of `variance` must be equal to length of `estimate`")
-    }
-
-    if (!is.null(denominator)) {
-      stop("`denominator` must be NULL when `dist` is not 'poisson'")
-    }
+  if (!is.numeric(variance)) {
+    stop("`variance` must be numeric")
   }
 
-  # determine limit quantiles
+  if (!all(variance >= 0, na.rm = TRUE)) {
+    stop("`variance` must be greater than or equal to 0")
+  }
 
+  if (length(estimate) != length(variance)) {
+    stop("length of `variance` must be equal to length of `estimate`")
+  }
+
+  # determine quantiles of interest
   alpha <- 1 - interval
-  q_low <- alpha / 2
-  q_high <- 1 - (alpha / 2)
+  q_upper <- 1 - (alpha / 2)
+  q_lower <- alpha /2
 
-  # construct confidence intervals
-
-  if (dist == "normal") {
+  if (log) {
+    # user chose log normal distribution
+    # transformation based on https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/comment-page-1/
+    esimate_log <- log(estimate**2 / sqrt(estimate**2 + variance))
+    sd_log <- sqrt(log(1 + (variance / estimate**2)))
+    ci <- purrr::map2(esimate_log, sd_log, ~ stats::qlnorm(c(q_lower, q_upper), .x, .y))
+  } else {
+    # user chose normal distribution
     sd <- sqrt(variance)
-    ci <- purrr::map2(estimate, sd, ~ stats::qnorm(c(q_low, q_high), .x, .y))
-  } else if (dist == "log normal") {
-    # transformation based on:
-    # https://en.wikipedia.org/wiki/Log-normal_distribution#Generation_and_parameters
-    # https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/comment-page-1/
-    mean_log <- log(estimate^2 / sqrt(estimate^2 + variance))
-    sd_log <- sqrt(log(1 + (variance / estimate^2)))
-    ci <- purrr::map2(mean_log, sd_log, ~ stats::qlnorm(c(q_low, q_high), .x, .y))
-  } else if (dist == "poisson") {
-    ci <- purrr::map2(estimate, denominator, ~ get_ci_pois(q_low, q_high, .x, .y))
+    ci <- purrr::map2(estimate, sd, ~ stats::qnorm(c(q_lower, q_upper), .x, .y))
   }
 
   # wrangle output
@@ -150,28 +101,170 @@ get_ci <- function(dist, interval, estimate, variance = NULL, denominator = NULL
 }
 
 
-#' Replicate `stats::qpois` using `stats::qchisq`
+#' Calculate a Poisson distribution confidence interval
 #'
-#' @description This function implements the Poisson distribution using the
-#' chi-squared distribution to allow for the continuous extension of integer
-#' variable (`estimate`). Read p.9385 of the [STDRATE Procedure](https://support.sas.com/documentation/onlinedoc/stat/151/stdrate.pdf)
-#' for more information.
+#' @description Calculate a Poisson distribution confidence interval. This function
+#' imitates [stats::qpois()] using [stats::qchisq()] to allow for the continuous
+#' extension of the estimate.
 #'
-#' @param estimate A scalar, must be a whole number (e.g. number of events)
-#' @param denominator A scalar (e.g. population-time)
-#' @param q_low A scalar, indicating the lower limit
-#' @param q_high A scalar, indicating the upper limit
+#' @param interval A scalar between 0 and 1, indicating the width of the interval.
+#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param x
+#' @param y
 #'
-#' @return A numeric vector containing the lower and upper limits
+#' @details This function is used to calculate confidence intervals in [get_spec_rt()].
+#'
+#' @return A data frame with columns `lower` and `upper` which contain the lower
+#' and upper limits of a confidence interval respectively.
 #'
 #' @examples
 #' \dontrun{
-#' get_ci_pois(q_low = 0.025, q_high = 0.975, estimate = 30, denominator = 1000)
+#' # calculate a single confidence interval
+#' get_ci_pois(interval = 0.95, x = 24)
+#' get_ci_pois(interval = 0.95, x = 49, y = 52)
+#'
+#' # use columns of a data frame as inputs
+#' df <- data.frame(x = c(24, 49), y = c(94, 52))
+#'
+#' # using dplyr
+#' df %>%
+#'   dplyr::mutate(get_ci_pois(0.95, x, y))
+#'
+#' # using base
+#' get_ci_pois(0.95, df$x, df$y)
 #' }
 #'
-#' @keywords internal
-get_ci_pois <- function(q_low, q_high, estimate, denominator) {
-  result <- stats::qchisq(c(q_low, q_high), df = c(2 * estimate, 2 * (estimate + 1))) / 2 / denominator
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @export
+get_ci_pois <- function(interval, x, y=NULL) {
+  # check validity of inputs
+
+  if (!is.numeric(interval)) {
+    stop("`interval` must be numeric")
+  }
+
+  if (length(interval) != 1) {
+    stop("`interval` must be a scalar")
+  }
+
+  if (interval < 0 | 1 < interval) {
+    stop("`interval` must be between 0 and 1")
+  }
+
+#  if (!all(x %% 1 == 0, na.rm = TRUE)) {
+#    stop("`x` must be an integer")
+#  }
+
+  if (is.null(y)) {
+    y <- 1
+  }
+
+  # determine quantiles of interest
+  alpha <- 1 - interval
+  q_upper <- 1 - (alpha / 2)
+  q_lower <- alpha /2
+
+  result <- data.frame(x = x, y = y) %>%
+    dplyr::mutate(lower = stats::qchisq(q_lower, df = 2 * x) / (2 * y),
+                  upper = stats::qchisq(q_upper, df = 2 * (x + 1)) / (2 * y)) %>%
+    dplyr::select(lower, upper)
 
   return(result)
+}
+
+
+#' Calculate a gamma distribution confidence interval
+#'
+#' @param interval A scalar between 0 and 1, indicating the width of the interval.
+#' @param estimate A numeric vector containing the point estimates.
+#' @param weights
+#' @param variance
+#' @param method
+#'
+#' @description This function uses [stats::qchisq()] to derive approximate confidence
+#' intervals.
+#'
+#' @return A data frame with columns `lower` and `upper` which contain the lower
+#' and upper limits of a confidence interval respectively.
+#'
+#' @example
+#' \dontrun{
+#' # calculate a single confidence interval
+#' e_1 <- 0.015
+#' w_1 <- c(3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
+#'        7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05)
+#' v_1 <- c(1e-06)
+#'
+#' get_ci_gamma(0.95, estimate = e_1, weights = list(w_1), variance = v_1)
+#' get_ci_gamma(0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
+#'
+#' # calculate multiple confidence intervals
+#' e_2 <- 0.004
+#' w_2 <- c(3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
+#'          6.3e-06, 3.5e-06, 5.4e-06, 1.5e-06, 2.3e-06)
+#' v_2 <- 1e-08
+#'
+#'
+#' }
+#'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @export
+get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06") {
+  # check validity of inputs
+
+  if (!is.numeric(interval)) {
+    stop("`interval` must be numeric")
+  }
+
+  if (length(interval) != 1) {
+    stop("`interval` must be a scalar")
+  }
+
+  if (interval < 0 | 1 < interval) {
+    stop("`interval` must be between 0 and 1")
+  }
+
+  if (!is.numeric(estimate)) {
+    stop("`estimate` must be numeric")
+  }
+
+  if (!is.numeric(variance)) {
+    stop("`variance` must be numeric")
+  }
+
+  if (!method %in% c("tcz06", "ff97")) {
+    stop("`method` must be either 'tcz06' or 'ff97'")
+  }
+
+  # determine quantiles of interest
+  alpha <- 1 - interval
+  q_lower <- alpha / 2
+  q_upper <- 1 - (alpha / 2)
+
+  dt <- data.table::data.table(estimate = estimate, variance = variance, weights = weights)
+
+  # define variables specific to method chosen by user
+  if (method == "tcz06") { # default
+    dt <- dt %>%
+      dplyr::mutate(w = purrr::map_dbl(weights, mean), # w_j
+                    w_sq = purrr::map(weights, ~ .x ** 2) %>%
+                      purrr::map_dbl(mean)) # w_j**2
+
+  } else if (method == "ff97") { # less conservative method
+    dt <- dt %>%
+      dplyr::mutate(w = purrr::map_dbl(weights, max), # w_x
+                    w_sq = w ** 2) # w_x**2
+  }
+
+  # construct confidence interval
+  dt <- dt %>%
+    dplyr::mutate(df_lower = (2 * (estimate ** 2)) / variance,
+                  df_upper = (2 * ((estimate + w) ** 2)) / (variance + w_sq),
+                  lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, df_lower),
+                  upper = ((variance + w_sq) / (2 * (estimate + w))) * stats::qchisq(q_upper, df_upper)) %>%
+    dplyr::select(lower, upper)
+
+  return(dt)
 }

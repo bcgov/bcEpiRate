@@ -1,0 +1,103 @@
+---
+title: "gamma dist"
+author: "Reiko Okamoto"
+date: "18/10/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+## R Markdown
+
+should this be wrapped up in the get ci function (i don't think so)
+
+implementation 1
+
+```{r}
+stratum <- c(1:10)
+counts <- c(85, 66, 42, 90, 18, 16, 16, 58, 52, 79)
+popn <- c(2282, 2206, 4811, 4266, 3938, 2448, 4664, 2424, 2446, 3747)
+std_popn <- c(229797, 132125, 259006, 141946, 241973, 465080, 485268, 393492, 112482, 262726)
+df <- data.frame(counts, popn, std_popn)
+
+df <- df %>%
+  mutate(spec_rt = bcEpiRate::get_spec_rt(counts = counts, popn = popn))
+
+dsr <- df %>% 
+  summarise(dsr = bcEpiRate::get_ds_rt(counts, popn, std_popn)) %>%
+  pull(dsr)
+```
+
+```{r}
+get_ci_gamma_test <- function(df, dsr, interval, ver = "ff97") {
+  df <- df %>%
+    mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn),
+           (w_j ** 2) * spec_rt * popn)
+  
+  alpha <- 1 - interval
+  q_lo <- alpha / 2
+  q_hi <- 1 - (alpha / 2)
+  
+  v <- df %>%
+    pull(-1) %>%
+    sum()
+  
+  # define lower bound degree of freedom
+  lower_dof <- (2 * (dsr ** 2)) / v
+    
+  # define lower bound
+  lower <- (v / (2 * dsr)) * qchisq(q_lo, df = lower_dof)
+  
+  if (ver == "ff97") {
+    # w_x
+    w <- df %>%
+      summarise(max(w_j)) %>%
+      pull()
+
+    w_sq <- w ** 2 
+  } else if (ver == "tcz06") {
+    # w_m 
+    w <- df %>%
+      summarise(mean(w_j)) %>%
+      pull()
+    
+    # w_2m
+    w_sq <- df %>%
+      summarise(mean(w_j ** 2)) %>%
+      pull()
+  }
+  
+  # define upper bound degree of freedom
+  upper_dof <- (2 * ((dsr + w) ** 2)) / (v + w_sq)
+  
+  # define upper bound
+  upper <- ((v + w_sq) / (2 * (dsr + w))) * qchisq(q_hi, df = upper_dof)
+  
+  result <- data.frame(lower, upper)
+  
+  return(result)
+}
+```
+
+what kind of checks should this pass?
+
+```{r}
+ex <- df %>%
+    mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn),
+           (w_j ** 2) * spec_rt * popn)
+ex_v <- ex %>%
+  pull(-1) %>%
+  sum()
+
+ex_v
+
+df$std_popn
+
+test_df <- data.frame(estimate = c(dsr, dsr), v = c(ex_v, ex_v), weights = I(list(df$std_popn, df$std_popn)))
+
+test_df %>%
+  mutate(w_2 = map(weights, .f = ~ .x ** 2),
+         w_2_mean = map_dbl(w_2, mean))
+```
+

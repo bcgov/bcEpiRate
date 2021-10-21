@@ -2,32 +2,43 @@
 % Please edit documentation in R/get_ci.R
 \name{get_ci_pois}
 \alias{get_ci_pois}
-\title{Replicate \code{stats::qpois} using \code{stats::qchisq}}
+\title{Calculate a Poisson distribution confidence interval}
 \usage{
-get_ci_pois(q_low, q_high, estimate, denominator)
+get_ci_pois(interval, x, y = NULL)
 }
 \arguments{
-\item{q_low}{A scalar, indicating the lower limit}
+\item{interval}{A scalar between 0 and 1, indicating the width of the interval.
+For example, use 0.95 to calculate a 95\% confidence interval.}
 
-\item{q_high}{A scalar, indicating the upper limit}
-
-\item{estimate}{A scalar, must be a whole number (e.g. number of events)}
-
-\item{denominator}{A scalar (e.g. population-time)}
+\item{y}{}
 }
 \value{
-A numeric vector containing the lower and upper limits
+A data frame with columns \code{lower} and \code{upper} which contain the lower
+and upper limits of a confidence interval respectively.
 }
 \description{
-This function implements the Poisson distribution using the
-chi-squared distribution to allow for the continuous extension of integer
-variable (\code{estimate}). Read p.9385 of the \href{https://support.sas.com/documentation/onlinedoc/stat/151/stdrate.pdf}{STDRATE Procedure}
-for more information.
+Calculate a Poisson distribution confidence interval. This function
+imitates \code{\link[stats:Poisson]{stats::qpois()}} using \code{\link[stats:Chisquare]{stats::qchisq()}} to allow for the continuous
+extension of the estimate.
+}
+\details{
+This function is used to calculate confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }
 \examples{
 \dontrun{
-get_ci_pois(q_low = 0.025, q_high = 0.975, estimate = 30, denominator = 1000)
+# calculate a single confidence interval
+get_ci_pois(interval = 0.95, x = 24)
+get_ci_pois(interval = 0.95, x = 49, y = 52)
+
+# use columns of a data frame as inputs
+df <- data.frame(x = c(24, 49), y = c(94, 52))
+
+# using dplyr
+df \%>\%
+  dplyr::mutate(get_ci_pois(0.95, x, y))
+
+# using base
+get_ci_pois(0.95, df$x, df$y)
 }
 
 }
-\keyword{internal}
