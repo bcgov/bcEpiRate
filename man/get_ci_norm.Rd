@@ -22,16 +22,15 @@ A data frame with columns \code{lower} and \code{upper} which contain the lower
 and upper limits of a confidence interval respectively.
 }
 \description{
-Calculate a (log) normal distribution confidence interval
+Calculate a (log) normal distribution confidence interval.
 }
 \details{
-This function is used to calculate confidence intervals in
-\code{\link[=get_spec_rt]{get_spec_rt()}} and \code{\link[=get_ds_rt]{get_ds_rt()}}.
-
 This function doesn't need to know which type of epidemiological measure has
 been passed to \code{estimate} (e.g., rate, risk). It also assumes that the values
-of the input arguments \code{estimate} and \code{variance} are aligned and the vectors
+of the input arguments \code{estimate} and \code{variance} are aligned and that the vectors
 are the same length.
+
+This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and \code{\link[=get_ds_rt]{get_ds_rt()}}.
 }
 \examples{
 \dontrun{
@@ -53,4 +52,7 @@ df \%>\%
 get_ci_norm(interval = 0.975, estimate = df$estimate, variance = df$variance)
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }

@@ -7,17 +7,62 @@
 get_ci_gamma(interval, estimate, weights, variance, method = "tcz06")
 }
 \arguments{
-\item{interval}{A scalar between 0 and 1, indicating the width of the interval.}
+\item{interval}{A scalar between 0 and 1, indicating the width of the interval.
+For example, use 0.95 to calculate a 95\% confidence interval.}
 
 \item{estimate}{A numeric vector containing the point estimates.}
 
-\item{method}{}
+\item{weights}{A list of numeric vectors containing the weights.}
+
+\item{variance}{A numeric vector containing the variances.}
+
+\item{method}{A string to indicate which method to use to calculate the
+confidence interval. The default is \code{"tcz06"} which refers to the method proposed
+by Tiwari, Clegg, and Zou (2006). Use \code{"ff97"} for a more conservative confidence
+interval proposed by Fay and Feuer (1997).}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
 and upper limits of a confidence interval respectively.
 }
 \description{
-This function uses \code{\link[stats:Chisquare]{stats::qchisq()}} to derive approximate confidence
-intervals.
+Derive an approximate gamma distribution confidence interval
+using \code{\link[stats:Chisquare]{stats::qchisq()}}.
+}
+\details{
+This function assumes that the values of the input arguments \code{estimate},
+\code{weights}, and \code{variance} are aligned and that they are the same length.
+
+This function is used to add confidence intervals in \code{\link[=get_ds_rt]{get_ds_rt()}}.
+}
+\examples{
+\dontrun{
+# calculate a single confidence interval
+e_1 <- 0.015
+w_1 <- c(
+  3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
+  7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05
+)
+v_1 <- c(1e-06)
+
+get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
+get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
+
+# calculate multiple confidence intervals
+e_2 <- 0.004
+w_2 <- c(
+  3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
+  6.3e-06, 3.5e-06, 5.4e-06, 1.5e-06, 2.3e-06
+)
+v_2 <- 1e-08
+
+get_ci_gamma(
+  interval = 0.9, estimate = c(e_1, e_2),
+  weights = list(w_1, w_2), variance = c(v_1, v_2)
+)
+}
+
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }

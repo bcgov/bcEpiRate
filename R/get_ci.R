@@ -1,6 +1,6 @@
 #' Calculate a (log) normal distribution confidence interval
 #'
-#' @description Calculate a (log) normal distribution confidence interval
+#' @description Calculate a (log) normal distribution confidence interval.
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the interval.
 #' For example, use 0.95 to calculate a 95% confidence interval.
@@ -9,16 +9,17 @@
 #' @param log A Boolean to indicate whether to use the log normal distribution.
 #' The default value is `FALSE`.
 #'
-#' @details This function is used to calculate confidence intervals in
-#' [get_spec_rt()] and [get_ds_rt()].
-#'
-#' This function doesn't need to know which type of epidemiological measure has
+#' @details This function doesn't need to know which type of epidemiological measure has
 #' been passed to `estimate` (e.g., rate, risk). It also assumes that the values
-#' of the input arguments `estimate` and `variance` are aligned and the vectors
+#' of the input arguments `estimate` and `variance` are aligned and that the vectors
 #' are the same length.
+#'
+#' This function is used to add confidence intervals in [get_spec_rt()] and [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
+#'
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
 #' @examples
 #' \dontrun{
@@ -43,7 +44,10 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
+get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
+  # TODO integrate normal CI into functions that calculate risk, standardized risk, SMR, rate difference, and risk difference
+  # TODO integrate log normal CI into functions that calculate risk, standardized risk, SMR, rate ratio, and risk ratio
+
   # check validity of inputs
 
   if (!is.numeric(interval)) {
@@ -74,10 +78,14 @@ get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
     stop("length of `variance` must be equal to length of `estimate`")
   }
 
+  if (!is.logical(log)) {
+    stop("`log` must be logical")
+  }
+
   # determine quantiles of interest
   alpha <- 1 - interval
   q_upper <- 1 - (alpha / 2)
-  q_lower <- alpha /2
+  q_lower <- alpha / 2
 
   if (log) {
     # user chose log normal distribution
@@ -109,10 +117,23 @@ get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the interval.
 #' For example, use 0.95 to calculate a 95% confidence interval.
-#' @param x
-#' @param y
+#' @param x A numeric vector containing the stratum-specific number of events or
+#' the observed number of events in the study population.
+#' @param y A numeric vector containing the population-time for each stratum or
+#' the expected number of events.
 #'
-#' @details This function is used to calculate confidence intervals in [get_spec_rt()].
+#' @details When working with rates, pass the stratum-specific
+#' number of events into `x` and the population-time for each stratum into `y`.
+#' When working with standardized morbidity/mortality ratios, pass the observed
+#' number of events into `x` and the expected number of events into `y`. Ensure
+#' that the values of `x` and `y` are aligned and that the vectors are the same
+#' length.
+#'
+#' Alternatively, to calculate a confidence interval for a rate, pass a vector
+#' of pre-calculated rates into `x` and set `y = 1`. The shorter vector `y` will
+#' be repeated so that its length matches that of `x`.
+#'
+#' This function is used to add confidence intervals in [get_spec_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
@@ -120,8 +141,8 @@ get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
 #' @examples
 #' \dontrun{
 #' # calculate a single confidence interval
-#' get_ci_pois(interval = 0.95, x = 24)
 #' get_ci_pois(interval = 0.95, x = 49, y = 52)
+#' get_ci_pois(interval = 0.95, x = 11, y = 1)
 #'
 #' # use columns of a data frame as inputs
 #' df <- data.frame(x = c(24, 49), y = c(94, 52))
@@ -134,10 +155,14 @@ get_ci_norm <- function(interval, estimate, variance, log=FALSE) {
 #' get_ci_pois(0.95, df$x, df$y)
 #' }
 #'
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci_pois <- function(interval, x, y=NULL) {
+get_ci_pois <- function(interval, x, y) {
+  # TODO integrate Poisson CI into function that calculates SMR
+
   # check validity of inputs
 
   if (!is.numeric(interval)) {
@@ -152,22 +177,30 @@ get_ci_pois <- function(interval, x, y=NULL) {
     stop("`interval` must be between 0 and 1")
   }
 
-#  if (!all(x %% 1 == 0, na.rm = TRUE)) {
-#    stop("`x` must be an integer")
-#  }
+  if (!is.numeric(x)) {
+    stop("`x` must be numeric")
+  }
 
-  if (is.null(y)) {
-    y <- 1
+  if (!is.numeric(y)) {
+    stop("`y` must be numeric")
+  }
+
+  if (y != 1) {
+    if (length(x) != length(y)) {
+      stop("length of `x` must be equal to length of `y`")
+    }
   }
 
   # determine quantiles of interest
   alpha <- 1 - interval
   q_upper <- 1 - (alpha / 2)
-  q_lower <- alpha /2
+  q_lower <- alpha / 2
 
   result <- data.frame(x = x, y = y) %>%
-    dplyr::mutate(lower = stats::qchisq(q_lower, df = 2 * x) / (2 * y),
-                  upper = stats::qchisq(q_upper, df = 2 * (x + 1)) / (2 * y)) %>%
+    dplyr::mutate(
+      lower = stats::qchisq(q_lower, df = 2 * x) / (2 * y),
+      upper = stats::qchisq(q_upper, df = 2 * (x + 1)) / (2 * y)
+    ) %>%
     dplyr::select(lower, upper)
 
   return(result)
@@ -176,36 +209,54 @@ get_ci_pois <- function(interval, x, y=NULL) {
 
 #' Calculate a gamma distribution confidence interval
 #'
-#' @param interval A scalar between 0 and 1, indicating the width of the interval.
-#' @param estimate A numeric vector containing the point estimates.
-#' @param weights
-#' @param variance
-#' @param method
+#' @description Derive an approximate gamma distribution confidence interval
+#' using [stats::qchisq()].
 #'
-#' @description This function uses [stats::qchisq()] to derive approximate confidence
-#' intervals.
+#' @param interval A scalar between 0 and 1, indicating the width of the interval.
+#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param estimate A numeric vector containing the point estimates.
+#' @param weights A list of numeric vectors containing the weights.
+#' @param variance A numeric vector containing the variances.
+#' @param method A string to indicate which method to use to calculate the
+#' confidence interval. The default is `"tcz06"` which refers to the method proposed
+#' by Tiwari, Clegg, and Zou (2006). Use `"ff97"` for a more conservative confidence
+#' interval proposed by Fay and Feuer (1997).
+#'
+#' @details This function assumes that the values of the input arguments `estimate`,
+#' `weights`, and `variance` are aligned and that they are the same length.
+#'
+#' This function is used to add confidence intervals in [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
 #'
-#' @example
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+#'
+#' @examples
 #' \dontrun{
 #' # calculate a single confidence interval
 #' e_1 <- 0.015
-#' w_1 <- c(3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
-#'        7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05)
+#' w_1 <- c(
+#'   3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
+#'   7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05
+#' )
 #' v_1 <- c(1e-06)
 #'
-#' get_ci_gamma(0.95, estimate = e_1, weights = list(w_1), variance = v_1)
-#' get_ci_gamma(0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
+#' get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
+#' get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
 #'
 #' # calculate multiple confidence intervals
 #' e_2 <- 0.004
-#' w_2 <- c(3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
-#'          6.3e-06, 3.5e-06, 5.4e-06, 1.5e-06, 2.3e-06)
+#' w_2 <- c(
+#'   3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
+#'   6.3e-06, 3.5e-06, 5.4e-06, 1.5e-06, 2.3e-06
+#' )
 #' v_2 <- 1e-08
 #'
-#'
+#' get_ci_gamma(
+#'   interval = 0.9, estimate = c(e_1, e_2),
+#'   weights = list(w_1, w_2), variance = c(v_1, v_2)
+#' )
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -230,6 +281,14 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
     stop("`estimate` must be numeric")
   }
 
+  if (!is.list(weights)) {
+    stop("`weights` must be a list")
+  }
+
+  if (!all(sapply(weights, is.numeric))) {
+    stop("`weights` must be a list of numeric vectors")
+  }
+
   if (!is.numeric(variance)) {
     stop("`variance` must be numeric")
   }
@@ -248,22 +307,27 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
   # define variables specific to method chosen by user
   if (method == "tcz06") { # default
     dt <- dt %>%
-      dplyr::mutate(w = purrr::map_dbl(weights, mean), # w_j
-                    w_sq = purrr::map(weights, ~ .x ** 2) %>%
-                      purrr::map_dbl(mean)) # w_j**2
-
+      dplyr::mutate(
+        w = purrr::map_dbl(weights, mean), # w_j
+        w_sq = purrr::map(weights, ~ .x**2) %>%
+          purrr::map_dbl(mean)
+      ) # w_j**2
   } else if (method == "ff97") { # less conservative method
     dt <- dt %>%
-      dplyr::mutate(w = purrr::map_dbl(weights, max), # w_x
-                    w_sq = w ** 2) # w_x**2
+      dplyr::mutate(
+        w = purrr::map_dbl(weights, max), # w_x
+        w_sq = w**2
+      ) # w_x**2
   }
 
   # construct confidence interval
   dt <- dt %>%
-    dplyr::mutate(df_lower = (2 * (estimate ** 2)) / variance,
-                  df_upper = (2 * ((estimate + w) ** 2)) / (variance + w_sq),
-                  lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, df_lower),
-                  upper = ((variance + w_sq) / (2 * (estimate + w))) * stats::qchisq(q_upper, df_upper)) %>%
+    dplyr::mutate(
+      df_lower = (2 * (estimate**2)) / variance,
+      df_upper = (2 * ((estimate + w)**2)) / (variance + w_sq),
+      lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, df_lower),
+      upper = ((variance + w_sq) / (2 * (estimate + w))) * stats::qchisq(q_upper, df_upper)
+    ) %>%
     dplyr::select(lower, upper)
 
   return(dt)

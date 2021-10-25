@@ -4,13 +4,17 @@
 \alias{get_ci_pois}
 \title{Calculate a Poisson distribution confidence interval}
 \usage{
-get_ci_pois(interval, x, y = NULL)
+get_ci_pois(interval, x, y)
 }
 \arguments{
 \item{interval}{A scalar between 0 and 1, indicating the width of the interval.
 For example, use 0.95 to calculate a 95\% confidence interval.}
 
-\item{y}{}
+\item{x}{A numeric vector containing the stratum-specific number of events or
+the observed number of events in the study population.}
+
+\item{y}{A numeric vector containing the population-time for each stratum or
+the expected number of events.}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
@@ -22,13 +26,24 @@ imitates \code{\link[stats:Poisson]{stats::qpois()}} using \code{\link[stats:Chi
 extension of the estimate.
 }
 \details{
-This function is used to calculate confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
+When working with rates, pass the stratum-specific
+number of events into \code{x} and the population-time for each stratum into \code{y}.
+When working with standardized morbidity/mortality ratios, pass the observed
+number of events into \code{x} and the expected number of events into \code{y}. Ensure
+that the values of \code{x} and \code{y} are aligned and that the vectors are the same
+length.
+
+Alternatively, to calculate a confidence interval for a rate, pass a vector
+of pre-calculated rates into \code{x} and set \code{y = 1}. The shorter vector \code{y} will
+be repeated so that its length matches that of \code{x}.
+
+This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }
 \examples{
 \dontrun{
 # calculate a single confidence interval
-get_ci_pois(interval = 0.95, x = 24)
 get_ci_pois(interval = 0.95, x = 49, y = 52)
+get_ci_pois(interval = 0.95, x = 11, y = 1)
 
 # use columns of a data frame as inputs
 df <- data.frame(x = c(24, 49), y = c(94, 52))
@@ -41,4 +56,7 @@ df \%>\%
 get_ci_pois(0.95, df$x, df$y)
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }
