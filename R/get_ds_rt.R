@@ -77,7 +77,7 @@
 #' @export
 get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
                       output_type = "rate", clean_strata = "none",
-                      dist = NULL, interval = NULL) {
+                      dist = NULL, interval = NULL, method = "tcz06") {
 
   # check validity of inputs
 
@@ -183,36 +183,42 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     stop("both `dist` and `interval` must be supplied to construct confidence intervals")
   }
 
-  # check if confidence intervals should be constructed
   if (!is.null(dist) & !is.null(interval)) {
     if (clean_strata == "zero") {
       stop("construction of confidence interval with clean_strata = 'zero' not yet implemented")
     }
-    if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) { # normal distribution
-      # calculate variance of directly standardized rate
-      var <- get_ds_rt_var(df)
-      threshold <- (1 - 0.997) / 2
-      check_value <- stats::pnorm(0, mean = df_dsr$dsr, sd = sqrt(var))
-      if (!is.na(check_value)) {
-        if (check_value > threshold) { # check if normal distribution should be avoided
-          warning("more than 0.15% of the probability mass lies below 0 for the estimate, consider using a different probability distribution")
-        }
-      }
-    } else if (stringr::str_detect(dist, stringr::regex("^log", ignore_case = TRUE))) { # log normal distribution
-      # calculate variance of directly standardized rate
-      var <- get_ds_rt_var(df)
+
+    # check validity of distribution name calculate confidence interval
+    dist_name <- get_dist_name(dist)
+    variance <- get_ds_rt_var(df)
+    if (dist_name == "normal") {
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(
+          get_ci_norm(interval = interval, estimate = .data$dsr, variance = variance)
+        )
+    } else if (dist_name == "lognormal") {
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(
+          get_ci_norm(interval = interval, estimate = .data$dsr, variance = variance, log = TRUE)
+        )
+    } else if (dist_name == "gamma") {
+      weights <- df %>%
+        dplyr::mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn)) %>%
+        dplyr::pull(w_j) %>%
+        list()
+
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(get_ci_gamma(interval = interval, estimate = .data$dsr, weights = weights,
+                                   variance = variance, method = method))
     } else {
-      stop("this function can only construct confidence intervals using normal and log normal distributions")
+      stop("`dist` should be one of 'normal', 'log normal', or 'gamma'")
     }
 
-    # construct confidence intervals
+    # clean output
     df_dsr <- df_dsr %>%
-      dplyr::mutate(
-        get_ci(dist = dist, interval = interval, estimate = .data$dsr, variance = var),
-        interval = interval
-      ) %>%
-      dplyr::select(.data$dsr, .data$lower, .data$upper, interval) %>%
-      dplyr::mutate(dplyr::across(.cols = c(.data$lower, .data$upper), ~ .x * multiplier)) # apply multiplier to lower and upper bounds
+      dplyr::mutate(interval = interval) %>%
+      dplyr::select(.data$dsr, .data$lower, .data$upper, .data$interval) %>%
+      dplyr::mutate(dplyr::across(.cols = c(.data$lower, .data$upper), ~ .x * multiplier)) # apply multiplier to lower and upper limits
   }
 
   # apply multiplier to rate
@@ -224,7 +230,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     if ("interval" %in% colnames(df_dsr)) {
       result <- df_dsr
     } else {
-      result <- df_dsr$dsr # confidence internal not constructed
+      result <- df_dsr$dsr # confidence interval not calculated
     }
   } else {
     result <- df$exp_counts

@@ -128,6 +128,10 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
   result <- purrr::map2_dfr(counts, popn, get_single_rt) %>%
     dplyr::mutate(status = as.character(.data$status))
 
+  if (xor(is.null(dist), is.null(interval))) {
+    stop("both `dist` and `interval` must be supplied to construct confidence intervals")
+  }
+
   if (!is.null(dist) & !is.null(interval)) {
     # check validity of distribution name and calculate confidence interval
     dist_name <- get_dist_name(dist)
@@ -154,10 +158,6 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
         upper = .data$upper * multiplier
       ) %>%
       dplyr::select(.data$rate, .data$interval, .data$lower, .data$upper, .data$status)
-  }
-
-  if (xor(is.null(dist), is.null(interval))) {
-    stop("both `dist` and `interval` must be supplied to construct confidence intervals")
   }
 
   # apply multiplier to rate
