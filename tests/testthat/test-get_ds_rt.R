@@ -286,23 +286,10 @@ test_that("function throws an error when `dist` is supplied, but not `interval`,
   )
 })
 
-test_that("function throws a warning to reconsider using normal distribution", {
-  expect_warning(
-    get_ds_rt(
-      counts = c(1, 5, 10, 15, 30),
-      popn = c(100, 100, 1200, 50000, 500000),
-      std_popn = c(1, 2, 3, 4, 5),
-      dist = "normal",
-      interval = 0.95
-    ),
-    "more than 0.15% of the probability mass lies below 0 for the estimate, consider using a different probability distribution"
-  )
-})
-
-test_that("function can only construct confidence intervals when `dist` is 'normal' or 'log normal'", {
+test_that("function throws an error when user provides unsupported distribution name", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, dist = "poisson", interval = 0.95),
-    "this function can only construct confidence intervals using normal and log normal distributions"
+    "`dist` should be one of 'normal', 'log normal', or 'gamma'"
   )
 })
 
