@@ -93,15 +93,21 @@ test_that("function throws an error when `scale` isn't a positive whole number",
 })
 
 test_that("function throws an error when `power` isn't a single number", {
-  expect_error(get_spec_rt(counts, popn, power = c(1, 2, 3)),
-               "`power` must be a single number")
+  expect_error(
+    get_spec_rt(counts, popn, power = c(1, 2, 3)),
+    "`power` must be a single number"
+  )
 })
 
 test_that("function throws an error when `power` isn't a non-negative whole number", {
-  expect_error(get_spec_rt(counts, popn, power = -1),
-               "`power` must be a non-negative whole number")
-  expect_error(get_spec_rt(counts, popn, power = 0.1),
-               "`power` must be a non-negative whole number")
+  expect_error(
+    get_spec_rt(counts, popn, power = -1),
+    "`power` must be a non-negative whole number"
+  )
+  expect_error(
+    get_spec_rt(counts, popn, power = 0.1),
+    "`power` must be a non-negative whole number"
+  )
 })
 
 # define vectors with NA
@@ -142,10 +148,14 @@ test_that("function raises both warnings, if necessary", {
   warnings <- capture_warnings(get_spec_rt(counts_na, popn_0s))
 
   expect_equal(2, length(warnings))
-  expect_equal(warnings[1],
-               "one or more elements in `counts` and/or `popn` are NA, pass `output_status = TRUE` to check")
-  expect_equal(warnings[2],
-               "one or more elements in `popn` are 0, pass `output_status = TRUE` to check")
+  expect_equal(
+    warnings[1],
+    "one or more elements in `counts` and/or `popn` are NA, pass `output_status = TRUE` to check"
+  )
+  expect_equal(
+    warnings[2],
+    "one or more elements in `popn` are 0, pass `output_status = TRUE` to check"
+  )
 })
 
 test_that("function outputs expected statuses", {
@@ -164,6 +174,13 @@ test_that("function outputs expected statuses", {
 })
 
 # Test ability to calculate confidence intervals ---------------------------
+test_that("function throws an error when user provides unsupported distribution name", {
+  expect_error(
+    get_spec_rt(counts = counts, popn = popn, power = 5, dist = "gamma", interval = 0.9),
+    "`dist` should be one of 'normal', 'log normal', or 'poisson'"
+  )
+})
+
 test_that("limits are NA when specific rates evaluate to 0", {
   counts_0 <- c(0, 50, 55, 60, 65)
 
@@ -177,7 +194,8 @@ test_that("limits are NA when specific rates evaluate to 0", {
     )) %>%
     # otherwise, check that limits are finite
     dplyr::pull(is_expected) %>%
-    all() %>% # should be all TRUE
+    all() %>%
+    # should be all TRUE
     expect_true()
 
   # using the log normal distribution
@@ -189,7 +207,8 @@ test_that("limits are NA when specific rates evaluate to 0", {
     )) %>%
     # otherwise, check that limits are finite
     dplyr::pull(is_expected) %>%
-    all() %>% # should be all TRUE
+    all() %>%
+    # should be all TRUE
     expect_true()
 
   # using the Poisson distribution
@@ -201,7 +220,8 @@ test_that("limits are NA when specific rates evaluate to 0", {
     )) %>%
     # otherwise, check that limits are finite
     dplyr::pull(is_expected) %>%
-    all() %>% # should be all TRUE
+    all() %>%
+    # should be all TRUE
     expect_true()
 })
 
@@ -240,6 +260,15 @@ test_that("function throws an error when `dist` is supplied, but not `interval`,
     get_spec_rt(counts, popn, power = 3, dist = "normal"),
     "both `dist` and `interval` must be supplied to construct confidence intervals"
   )
+})
+
+test_that("multipliers are applied correctly", {
+  expect_equal(get_spec_rt(counts, popn, power = 3, dist = "lognormal", interval = 0.95),
+               get_spec_rt(counts, popn, dist = "lognormal", interval = 0.95) %>%
+                 dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 1000)))
+  expect_equal(get_spec_rt(counts, popn, scale = 100000, dist = "poisson", interval = 0.9),
+               get_spec_rt(counts, popn, dist = "poisson", interval = 0.9) %>%
+                 dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 100000)))
 })
 
 test_that("type and shape of output data are as expected based on input", {

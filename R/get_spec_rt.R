@@ -119,7 +119,7 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
       stop("`power` must be a non-negative whole number")
     }
 
-    multiplier <- 10**power
+    multiplier <- 10 ** power
   } else { # if neither `scale` nor `power` is supplied, return the rates as is (i.e. `scale` = 1)
     multiplier <- 1
   }
@@ -172,9 +172,11 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     if ("has_NA" %in% result$status) {
       warning("one or more elements in `counts` and/or `popn` are NA, pass `output_status = TRUE` to check")
     }
+
     if ("denom_0" %in% result$status) {
       warning("one or more elements in `popn` are 0, pass `output_status = TRUE` to check")
     }
+
     if ("interval" %in% colnames(result)) {
       result <- result %>%
         dplyr::select(-.data$status)
