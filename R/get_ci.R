@@ -96,6 +96,14 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
   } else {
     # user chose normal distribution
     sd <- sqrt(variance)
+
+    # check if distribution should be avoided
+    threshold <- (1 - 0.997) / 2
+    mass_below_0 <- stats::pnorm(0, mean = estimate, sd = sd)
+    if (any(mass_below_0 > threshold, na.rm = TRUE)) {
+      warning("more than 0.15% of the probability mass lies below 0 for at least one of the estimates, consider using a different probability distribution")
+    }
+
     ci <- purrr::map2(estimate, sd, ~ stats::qnorm(c(q_lower, q_upper), .x, .y))
   }
 
@@ -185,10 +193,8 @@ get_ci_pois <- function(interval, x, y) {
     stop("`y` must be numeric")
   }
 
-  if (y != 1) {
-    if (length(x) != length(y)) {
-      stop("length of `x` must be equal to length of `y`")
-    }
+  if (length(y) != 1 & length(y) != length(x)) {
+    stop("length of `y` is not compatible with that of `x`")
   }
 
   # determine quantiles of interest
@@ -331,4 +337,29 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
     dplyr::select(lower, upper)
 
   return(dt)
+}
+
+
+#' Use regex to detect a probability distribution name
+#'
+#' @param dist A string provided by the user
+#'
+#' @return One of "normal", "lognormal", "poisson", or "gamma". If there is no
+#' match, an error is thrown.
+#'
+#' @keywords internal
+get_dist_name  <- function(dist) {
+  if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) {
+    name <- "normal"
+  } else if (stringr::str_detect(dist, stringr::regex("^log(-|\\s)?normal$", ignore_case = TRUE))) {
+    name <- "lognormal"
+  } else if (stringr::str_detect(dist, stringr::regex("^poisson$", ignore_case = TRUE))) {
+    name <- "poisson"
+  } else if (stringr::str_detect(dist, stringr::regex("^gamma$", ignore_case = TRUE))) {
+    name <- "gamma"
+  } else {
+    stop("string does not match name of probability distribution supported by package")
+  }
+
+  return(name)
 }

@@ -1,4 +1,4 @@
-# TEST BASIC FUNCTIONALITY
+# Test ability to calculate specific rates ---------------------------
 
 # define necessary arguments
 counts <- c(1, 2, 3, 4, 5)
@@ -163,15 +163,7 @@ test_that("function outputs expected statuses", {
   )
 })
 
-# TEST ABILITY TO CONSTRUCT CONFIDENCE INTERVALS
-
-test_that("function throws a warning to reconsider using the normal distribution", {
-  expect_warning(
-    get_spec_rt(c(1, 8, 1, 8), c(1, 1, 100000, 100000), dist = "normal", interval = 0.95),
-    "more than 0.15% of the probability mass lies below 0 for at least one of the estimates, consider using a different probability distribution"
-  )
-})
-
+# Test ability to calculate confidence intervals ---------------------------
 test_that("limits are NA when specific rates evaluate to 0", {
   counts_0 <- c(0, 50, 55, 60, 65)
 
@@ -251,24 +243,24 @@ test_that("function throws an error when `dist` is supplied, but not `interval`,
 })
 
 test_that("type and shape of output data are as expected based on input", {
-  # Option A: no CIs, no output status
+  # Option A: no confidence intervals, no output status
   output_a <- get_spec_rt(counts, popn, scale = 1000)
   expect_true(is.double(output_a))
   expect_false(is.data.frame(output_a))
 
-  # Option B: no CIs, include output status
+  # Option B: no confidence intervals, include output status
   output_b <- get_spec_rt(counts, popn, scale = 1000, output_status = TRUE)
   expect_true(is.data.frame(output_b))
   expect_equal(ncol(output_b), 2)
   expect_true(setequal(c("rate", "status"), colnames(output_b)))
 
-  # Option C: CIs, no output status
+  # Option C: confidence intervals, no output status
   output_c <- get_spec_rt(c(30, 40, 50, 60, 70), c(1000, 1200, 1400, 1600, 1800), scale = 1000, dist = "normal", interval = 0.99)
   expect_true(is.data.frame(output_c))
   expect_equal(ncol(output_c), 4)
   expect_true(setequal(c("rate", "interval", "lower", "upper"), colnames(output_c)))
 
-  # Option D: CIs, include output status
+  # Option D: confidence intervals, include output status
   output_d <- get_spec_rt(c(30, 40, 50, 60, 70), c(1000, 1200, 1400, 1600, 1800), scale = 1000, dist = "normal", interval = 0.99, output_status = TRUE)
   expect_true(is.data.frame(output_d))
   expect_equal(ncol(output_d), 5)

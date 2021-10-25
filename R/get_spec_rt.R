@@ -109,7 +109,6 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     }
 
     multiplier <- scale
-
   } else if (is.null(scale) & !is.null(power)) { # if only `power` is supplied
     if (length(power) != 1) {
       stop("`power` must be a single number")
@@ -121,7 +120,6 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     }
 
     multiplier <- 10**power
-
   } else { # if neither `scale` nor `power` is supplied, return the rates as is (i.e. `scale` = 1)
     multiplier <- 1
   }
@@ -130,32 +128,23 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
   result <- purrr::map2_dfr(counts, popn, get_single_rt) %>%
     dplyr::mutate(status = as.character(.data$status))
 
-  if (!(is.null(dist) | is.null(interval))) { # check if confidence intervals should be constructed
-    if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) { # normal distribution
-      variance <- result$rate / popn
-      threshold <- (1 - 0.997) / 2
-      check_value <- stats::pnorm(0, mean = result$rate, sd = sqrt(variance))
-      if (any(check_value > threshold, na.rm = TRUE)) { # check if this distribution should be avoided
-        warning("more than 0.15% of the probability mass lies below 0 for at least one of the estimates, consider using a different probability distribution")
-      }
-    } else if (stringr::str_detect(dist, stringr::regex("^log", ignore_case = TRUE))) { # log normal distribution
-      variance <- result$rate / popn
-    } else { # poisson
-      variance <- NULL
+  if (!is.null(dist) & !is.null(interval)) {
+    # check validity of distribution name and calculate confidence interval
+    dist_name <- get_dist_name(dist)
+    variance <- result$rate / popn
+    if (dist_name == "normal") {
+      ci <- get_ci_norm(interval = interval, estimate = result$rate, variance = variance)
+    } else if (dist_name == "lognormal") {
+      ci <- get_ci_norm(interval = interval, estimate = result$rate, variance = variance, log = TRUE)
+    } else if (dist_name == "poisson") {
+      ci <- get_ci_pois(interval = interval, x = counts, y = popn)
+    } else {
+      stop("`dist` should be one of 'normal', 'log normal', or 'poisson'")
     }
 
-    # calculate upper and lower limits
-    if (!is.null(variance)) { # normal and log normal
-      ci <- get_ci(dist = dist, interval = interval, estimate = result$rate, variance = variance)
-      result <- result %>%
-        dplyr::mutate(lower = ci$lower, upper = ci$upper, interval = interval)
-    } else { # poisson
-      ci <- get_ci(dist = dist, interval = interval, estimate = counts, denominator = popn)
-      result <- result %>%
-        dplyr::mutate(lower = ci$lower, upper = ci$upper, interval = interval)
-    }
-
+    # add confidence interval to output
     result <- result %>%
+      dplyr::mutate(lower = ci$lower, upper = ci$upper, interval = interval) %>%
       dplyr::mutate( # overwrite limits with NA when `rate` is 0
         lower = dplyr::if_else(.data$rate == 0, NA_real_, .data$lower),
         upper = dplyr::if_else(.data$rate == 0, NA_real_, .data$upper)
@@ -183,11 +172,9 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     if ("has_NA" %in% result$status) {
       warning("one or more elements in `counts` and/or `popn` are NA, pass `output_status = TRUE` to check")
     }
-
     if ("denom_0" %in% result$status) {
       warning("one or more elements in `popn` are 0, pass `output_status = TRUE` to check")
     }
-
     if ("interval" %in% colnames(result)) {
       result <- result %>%
         dplyr::select(-.data$status)
@@ -197,7 +184,6 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     }
   }
 }
-
 
 #' Calculate a single rate and evaluate the validity of the output
 #'
