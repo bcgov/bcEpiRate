@@ -46,8 +46,6 @@ Otherwise, a data frame is returned with a column for \code{rate} and up to 4 ad
 \description{
 Calculate specific rates given a vector containing the frequencies of events
 and a vector containing the sizes of the defined populations.
-Visit \href{https://www.statcan.gc.ca/eng/dai/btd/asr}{Statistics Canada} for more
-information.
 }
 \details{
 This low-level function assumes that counts and sizes of respective
@@ -95,4 +93,7 @@ df <- df \%>\%
   dplyr::mutate(spec_rate = get_spec_rt(counts, popn, scale = 1000))
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }

@@ -13,7 +13,8 @@ get_ds_rt(
   output_type = "rate",
   clean_strata = "none",
   dist = NULL,
-  interval = NULL
+  interval = NULL,
+  method = NULL
 )
 }
 \arguments{
@@ -26,11 +27,12 @@ standard population.}
 
 \item{scale, power}{Provide either \code{scale}, a positive integer, to specify the
 scale, or \code{power}, a non-negative integer, to specify the power of 10 to use
-when expressing the result. If neither argument is supplied, \code{scale = 1} will be
-applied.}
+when expressing the result. If neither argument is supplied, \code{scale = 1} will
+be applied.}
 
-\item{output_type}{If \code{"rate"} (default), the directly standardized rate is returned.
-If \code{"counts"}, the expected number of events for each stratum is returned.}
+\item{output_type}{If \code{"rate"} (default), the directly standardized rate is
+returned. If \code{"counts"}, the expected number of events for each stratum is
+returned.}
 
 \item{clean_strata}{\itemize{
 \item \code{"none"} returns a directly standardized rate if and only if the evaluated
@@ -39,33 +41,44 @@ specific rates are free of \code{NA} and \code{std_popn} is free of \code{NA} an
 values of \code{NA} or \code{0} from the calculation of the directly standardized rate.
 \code{NA} is returned if all strata are excluded from the calculation.
 \item \code{"zero"} sets specific rates evaluated to \code{NA} as 0. In addition, when
-\code{std_popn} contains 0, the respective stratum is excluded from the calculation of
-the directly standardized rate. However, when \code{std_popn} contains \code{NA}, the
-directly standardized rate is evaluated to \code{NA}. When \code{output_type = "counts"},
-the expected counts are calculated \emph{after} specific rates of \code{NA} have been set to 0.
-\emph{Confidence intervals cannot be constructed when this argument is used.}
+\code{std_popn} contains 0, the respective stratum is excluded from the
+calculation of the directly standardized rate. However, when \code{std_popn}
+contains \code{NA}, the directly standardized rate is evaluated to \code{NA}. When
+\code{output_type = "counts"}, the expected counts are calculated \emph{after}
+specific rates of \code{NA} have been set to 0. \emph{Confidence intervals cannot be
+constructed when this argument is used.}
 }}
 
 \item{dist}{A string to indicate the type of probability distribution for the
-confidence interval to follow. Can be either \code{"normal"} or \code{"log normal"}.
-This parameter is case insensitive.}
+confidence interval to follow. Can be either \code{"normal"}, \code{"log normal"}, or
+\code{"gamma"}. This parameter is case insensitive.}
 
 \item{interval}{A scalar, between 0 and 1, indicating the width of the
-confidence interval. For example, for a 95\% confidence interval, use \code{interval = 0.95}.}
+confidence interval. For example, for a 95\% confidence interval, use
+\code{interval = 0.95}.}
+
+\item{method}{A string specifying the method to use when calculating
+confidence intervals based on the gamma distribution. Use \code{"tcz06"} (default)
+for the method proposed by Tiwari, Clegg, and Zou (2006) and \code{"ff97"} for the
+more conservative method proposed by Fay and Feuer (1997). This parameter
+must be left empty when calculating confidence intervals using other
+distributions.}
 }
 \value{
-If \code{output_type = "rate"} (default) and neither \code{dist} or \code{interval} is supplied,
-the directly standardized rate is returned as a numeric vector.
+If \code{output_type = "rate"} (default) and neither \code{dist} or \code{interval} is
+supplied, the directly standardized rate is returned as a numeric vector.
 
 If \code{output_type = "rate"} and both \code{dist} and \code{interval} are provided, then a
-data frame is returned with the columns \code{rate}, \code{lower}, \code{upper} and \code{interval}.
+data frame is returned with the columns \code{rate}, \code{lower}, \code{upper} and
+\code{interval}.
 
-If \code{output_type = "counts"}, the expected counts are returned as a numeric vector.
+If \code{output_type = "counts"}, the expected counts are returned as a numeric
+vector.
 }
 \description{
 Compute a directly standardized rate given the counts of events,
-the size of each defined population and the size of each group of the standard
-population.
+the size of each defined population and the size of each group of the
+standard population.
 }
 \details{
 This low-level function assumes that the counts in each stratum,
@@ -74,8 +87,9 @@ stratum in the standard population are provided in the same order.
 
 To construct confidence intervals for the rate estimates, arguments must be
 supplied to both \code{dist} and \code{interval}. In general, \emph{the normal distribution
-should not be used to construct confidence intervals when the standard deviation
-is greater than a third of the mean}. The function throws a warning if this is the case.
+should not be used to construct confidence intervals when the standard
+deviation is greater than a third of the mean}. A warning is raised if this
+is the case.
 }
 \examples{
 \dontrun{
@@ -89,7 +103,14 @@ get_ds_rt(counts, popn, std_popn, scale = 1000)
 get_ds_rt(counts, popn, std_popn, power = 3)
 get_ds_rt(counts, popn, std_popn, output_type = "counts")
 get_ds_rt(counts, popn, std_popn, clean_strata = "exclude")
-get_ds_rt(counts, popn, std_popn, scale = 1000, dist = "normal", interval = 0.95)
+get_ds_rt(
+  counts, popn, std_popn, scale = 1000,
+  dist = "normal", interval = 0.95
+)
+get_ds_rt(
+  counts, popn, std_popn, scale = 100000,
+  dist = "gamma", interval = 0.9, method = "ff97"
+)
 
 # using a data frame
 df <- data.frame(counts, popn, std_popn)
@@ -98,4 +119,7 @@ get_ds_rt(df$counts, df$popn, df$std_popn, scale = 1000)
 get_ds_rt(df$counts, df$popn, df$std_popn, power = 3)
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }

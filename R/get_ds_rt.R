@@ -1,8 +1,8 @@
 #' Perform direct standardization
 #'
 #' @description Compute a directly standardized rate given the counts of events,
-#' the size of each defined population and the size of each group of the standard
-#' population.
+#' the size of each defined population and the size of each group of the
+#' standard population.
 #'
 #' @param counts A numeric vector containing the frequency of events.
 #' @param popn A numeric vector containing the size of each defined population.
@@ -10,10 +10,11 @@
 #' standard population.
 #' @param scale,power Provide either `scale`, a positive integer, to specify the
 #' scale, or `power`, a non-negative integer, to specify the power of 10 to use
-#' when expressing the result. If neither argument is supplied, `scale = 1` will be
-#' applied.
-#' @param output_type If `"rate"` (default), the directly standardized rate is returned.
-#' If `"counts"`, the expected number of events for each stratum is returned.
+#' when expressing the result. If neither argument is supplied, `scale = 1` will
+#' be applied.
+#' @param output_type If `"rate"` (default), the directly standardized rate is
+#' returned. If `"counts"`, the expected number of events for each stratum is
+#' returned.
 #' @param clean_strata
 #'
 #'  * `"none"` returns a directly standardized rate if and only if the evaluated
@@ -22,16 +23,24 @@
 #'  values of `NA` or `0` from the calculation of the directly standardized rate.
 #'  `NA` is returned if all strata are excluded from the calculation.
 #'  * `"zero"` sets specific rates evaluated to `NA` as 0. In addition, when
-#'  `std_popn` contains 0, the respective stratum is excluded from the calculation of
-#'  the directly standardized rate. However, when `std_popn` contains `NA`, the
-#'  directly standardized rate is evaluated to `NA`. When `output_type = "counts"`,
-#'  the expected counts are calculated *after* specific rates of `NA` have been set to 0.
-#'  *Confidence intervals cannot be constructed when this argument is used.*
+#'  `std_popn` contains 0, the respective stratum is excluded from the
+#'  calculation of the directly standardized rate. However, when `std_popn`
+#'  contains `NA`, the directly standardized rate is evaluated to `NA`. When
+#'  `output_type = "counts"`, the expected counts are calculated *after*
+#'  specific rates of `NA` have been set to 0. *Confidence intervals cannot be
+#'  constructed when this argument is used.*
 #' @param dist A string to indicate the type of probability distribution for the
-#' confidence interval to follow. Can be either `"normal"` or `"log normal"`.
-#' This parameter is case insensitive.
+#' confidence interval to follow. Can be either `"normal"`, `"log normal"`, or
+#' `"gamma"`. This parameter is case insensitive.
 #' @param interval A scalar, between 0 and 1, indicating the width of the
-#' confidence interval. For example, for a 95% confidence interval, use `interval = 0.95`.
+#' confidence interval. For example, for a 95% confidence interval, use
+#' `interval = 0.95`.
+#' @param method A string specifying the method to use when calculating
+#' confidence intervals based on the gamma distribution. Use `"tcz06"` (default)
+#' for the method proposed by Tiwari, Clegg, and Zou (2006) and `"ff97"` for the
+#' more conservative method proposed by Fay and Feuer (1997). This parameter
+#' must be left empty when calculating confidence intervals using other
+#' distributions.
 #'
 #' @details This low-level function assumes that the counts in each stratum,
 #' the size of each stratum in the observed population and the size of each
@@ -39,17 +48,22 @@
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
 #' supplied to both `dist` and `interval`. In general, *the normal distribution
-#' should not be used to construct confidence intervals when the standard deviation
-#' is greater than a third of the mean*. The function throws a warning if this is the case.
+#' should not be used to construct confidence intervals when the standard
+#' deviation is greater than a third of the mean*. A warning is raised if this
+#' is the case.
 #'
 #' @return
-#' If `output_type = "rate"` (default) and neither `dist` or `interval` is supplied,
-#' the directly standardized rate is returned as a numeric vector.
+#' If `output_type = "rate"` (default) and neither `dist` or `interval` is
+#' supplied, the directly standardized rate is returned as a numeric vector.
 #'
 #' If `output_type = "rate"` and both `dist` and `interval` are provided, then a
-#' data frame is returned with the columns `rate`, `lower`, `upper` and `interval`.
+#' data frame is returned with the columns `rate`, `lower`, `upper` and
+#' `interval`.
 #'
-#' If `output_type = "counts"`, the expected counts are returned as a numeric vector.
+#' If `output_type = "counts"`, the expected counts are returned as a numeric
+#' vector.
+#'
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
 #' @examples
 #' \dontrun{
@@ -63,7 +77,14 @@
 #' get_ds_rt(counts, popn, std_popn, power = 3)
 #' get_ds_rt(counts, popn, std_popn, output_type = "counts")
 #' get_ds_rt(counts, popn, std_popn, clean_strata = "exclude")
-#' get_ds_rt(counts, popn, std_popn, scale = 1000, dist = "normal", interval = 0.95)
+#' get_ds_rt(
+#'   counts, popn, std_popn, scale = 1000,
+#'   dist = "normal", interval = 0.95
+#' )
+#' get_ds_rt(
+#'   counts, popn, std_popn, scale = 100000,
+#'   dist = "gamma", interval = 0.9, method = "ff97"
+#' )
 #'
 #' # using a data frame
 #' df <- data.frame(counts, popn, std_popn)
@@ -77,7 +98,7 @@
 #' @export
 get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
                       output_type = "rate", clean_strata = "none",
-                      dist = NULL, interval = NULL, method = "tcz06") {
+                      dist = NULL, interval = NULL, method = NULL) {
 
   # check validity of inputs
 
