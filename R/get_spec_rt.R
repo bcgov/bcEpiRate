@@ -13,10 +13,12 @@
 #' @param output_status If `FALSE` (default) the calculated rates are returned
 #' as a numeric vector. If `TRUE` a data frame containing both the rates and
 #' the validity of the corresponding elements in the input vectors is returned.
-#' @param dist A string to indicate the type of probability distribution for the confidence interval to follow.
-#' Can be one of the following: `"normal"`, `"log normal"`, or `"poisson"`. This parameter is case insensitive.
-#' @param interval A scalar, between 0 and 1, indicating the width of the confidence interval.
-#' For example, for a 95% confidence interval, use `interval = 0.95`.
+#' @param dist A string to indicate the type of probability distribution for the
+#' confidence interval to follow. Can be one of the following: `"normal"`,
+#' `"log normal"`, or `"poisson"`. This parameter is case insensitive.
+#' @param interval A scalar, between 0 and 1, indicating the width of the
+#' confidence interval. For example, for a 95% confidence interval, use
+#' `interval = 0.95`.
 #'
 #' @details This low-level function assumes that counts and sizes of respective
 #' subpopulations are provided in the same order. It can also be used to
@@ -30,16 +32,21 @@
 #' * `"success"` indicates that both the numerator and denominator of the
 #' fraction were valid numbers.
 #'
-#' To construct confidence intervals for the rate estimates, arguments must be supplied to both `dist` and `interval`.
-#' In general, *the normal distribution should not be used to construct confidence intervals when the standard deviation
-#' is greater than a third of the mean*. The function throws a warning if this is the case.
+#' To construct confidence intervals for the rate estimates, arguments must be
+#' supplied to both `dist` and `interval`. In general, *the normal distribution
+#' should not be used to construct confidence intervals when the standard
+#' deviation is greater than a third of the mean*. A warning is raised if this
+#' is the case.
 #'
 #' @return
-#' If `output_status = FALSE` and neither `dist` or `interval` is supplied, a numeric vector is returned.
+#' If `output_status = FALSE` and neither `dist` or `interval` is supplied, a
+#' numeric vector is returned.
 #'
-#' Otherwise, a data frame is returned with a column for `rate` and up to 4 additional columns:
+#' Otherwise, a data frame is returned with a column for `rate` and up to 4
+#' additional columns:
 #'  * If `output_status = TRUE`, then the column `status` is included.
-#'  * If both `dist` and `interval` are provided, then the columns `interval`, `lower`, and `upper` are also included.
+#'  * If both `dist` and `interval` are provided, then the columns `interval`,
+#'  `lower`, and `upper` are also included.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'

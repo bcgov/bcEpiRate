@@ -236,6 +236,11 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         dplyr::pull(w_j) %>%
         list()
 
+      # if user doesn't specify a method, use the default
+      if (is.null(method)) {
+        method <- "tcz06"
+      }
+
       df_dsr <- df_dsr %>%
         dplyr::mutate(get_ci_gamma(
           interval = interval, estimate = .data$dsr, weights = weights,

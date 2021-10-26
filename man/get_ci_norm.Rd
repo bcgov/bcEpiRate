@@ -7,8 +7,8 @@
 get_ci_norm(interval, estimate, variance, log = FALSE)
 }
 \arguments{
-\item{interval}{A scalar between 0 and 1, indicating the width of the interval.
-For example, use 0.95 to calculate a 95\% confidence interval.}
+\item{interval}{A scalar between 0 and 1, indicating the width of the
+interval. For example, use 0.95 to calculate a 95\% confidence interval.}
 
 \item{estimate}{A numeric vector containing the point estimates.}
 
@@ -25,12 +25,13 @@ and upper limits of a confidence interval respectively.
 Calculate a (log) normal distribution confidence interval.
 }
 \details{
-This function doesn't need to know which type of epidemiological measure has
-been passed to \code{estimate} (e.g., rate, risk). It also assumes that the values
-of the input arguments \code{estimate} and \code{variance} are aligned and that the vectors
-are the same length.
+This function doesn't need to know which type of epidemiological
+measure has been passed to \code{estimate} (e.g., rate, risk). It also assumes
+that the values of the input arguments \code{estimate} and \code{variance} are aligned
+and that the vectors are the same length.
 
-This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and \code{\link[=get_ds_rt]{get_ds_rt()}}.
+This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and
+\code{\link[=get_ds_rt]{get_ds_rt()}}.
 }
 \examples{
 \dontrun{

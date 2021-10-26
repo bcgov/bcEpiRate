@@ -15,12 +15,12 @@ get_smr(count, popn, std_rt, output_type = "ratio", percent = FALSE)
 the number of cases per unit of population) for each stratum in the standard
 population.}
 
-\item{output_type}{If \code{"ratio"} (default), only the SMR is returned. If \code{"counts"},
-the expected number of deaths for each stratum in the observed population is
-returned as a vector.}
+\item{output_type}{If \code{"ratio"} (default), only the SMR is returned. If
+\code{"counts"}, the expected number of deaths for each stratum in the observed
+population is returned as a vector.}
 
-\item{percent}{If \code{FALSE} (default), the SMR is returned as is (e.g. 0.5). If \code{TRUE}, the
-SMR is expressed as a percentage (e.g. 50).}
+\item{percent}{If \code{FALSE} (default), the SMR is returned as is (e.g. 0.5).
+If \code{TRUE}, the SMR is expressed as a percentage (e.g. 50).}
 }
 \value{
 Either the SMR as a scalar or an array of the expected counts for
@@ -28,9 +28,9 @@ each stratum.
 }
 \description{
 Compute a standardized mortality ratio (SMR) or expected number
-of deaths given the number of observed deaths, the size of each stratum in the
-observed population, and the specific rate for each stratum in the standard
-population.
+of deaths given the number of observed deaths, the size of each stratum in
+the observed population, and the specific rate for each stratum in the
+standard population.
 }
 \details{
 This low-level function assumes that the size of each stratum in the

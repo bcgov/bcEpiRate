@@ -7,8 +7,8 @@
 get_ci_gamma(interval, estimate, weights, variance, method = "tcz06")
 }
 \arguments{
-\item{interval}{A scalar between 0 and 1, indicating the width of the interval.
-For example, use 0.95 to calculate a 95\% confidence interval.}
+\item{interval}{A scalar between 0 and 1, indicating the width of the
+interval. For example, use 0.95 to calculate a 95\% confidence interval.}
 
 \item{estimate}{A numeric vector containing the point estimates.}
 
@@ -17,9 +17,9 @@ For example, use 0.95 to calculate a 95\% confidence interval.}
 \item{variance}{A numeric vector containing the variances.}
 
 \item{method}{A string to indicate which method to use to calculate the
-confidence interval. The default is \code{"tcz06"} which refers to the method proposed
-by Tiwari, Clegg, and Zou (2006). Use \code{"ff97"} for a more conservative confidence
-interval proposed by Fay and Feuer (1997).}
+confidence interval. The default is \code{"tcz06"} which refers to the method
+proposed by Tiwari, Clegg, and Zou (2006). Use \code{"ff97"} for a more
+conservative confidence interval proposed by Fay and Feuer (1997).}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
@@ -30,8 +30,9 @@ Derive an approximate gamma distribution confidence interval
 using \code{\link[stats:Chisquare]{stats::qchisq()}}.
 }
 \details{
-This function assumes that the values of the input arguments \code{estimate},
-\code{weights}, and \code{variance} are aligned and that they are the same length.
+This function assumes that the values of the input arguments
+\code{estimate}, \code{weights}, and \code{variance} are aligned and that they are the same
+length.
 
 This function is used to add confidence intervals in \code{\link[=get_ds_rt]{get_ds_rt()}}.
 }

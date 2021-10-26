@@ -2,19 +2,20 @@
 #'
 #' @description Calculate a (log) normal distribution confidence interval.
 #'
-#' @param interval A scalar between 0 and 1, indicating the width of the interval.
-#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param interval A scalar between 0 and 1, indicating the width of the
+#' interval. For example, use 0.95 to calculate a 95% confidence interval.
 #' @param estimate A numeric vector containing the point estimates.
 #' @param variance A numeric vector containing the variances.
 #' @param log A Boolean to indicate whether to use the log normal distribution.
 #' The default value is `FALSE`.
 #'
-#' @details This function doesn't need to know which type of epidemiological measure has
-#' been passed to `estimate` (e.g., rate, risk). It also assumes that the values
-#' of the input arguments `estimate` and `variance` are aligned and that the vectors
-#' are the same length.
+#' @details This function doesn't need to know which type of epidemiological
+#' measure has been passed to `estimate` (e.g., rate, risk). It also assumes
+#' that the values of the input arguments `estimate` and `variance` are aligned
+#' and that the vectors are the same length.
 #'
-#' This function is used to add confidence intervals in [get_spec_rt()] and [get_ds_rt()].
+#' This function is used to add confidence intervals in [get_spec_rt()] and
+#' [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
@@ -90,9 +91,9 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
   if (log) {
     # user chose log normal distribution
     # transformation based on https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/comment-page-1/
-    esimate_log <- log(estimate**2 / sqrt(estimate**2 + variance))
+    estimate_log <- log(estimate**2 / sqrt(estimate**2 + variance))
     sd_log <- sqrt(log(1 + (variance / estimate**2)))
-    ci <- purrr::map2(esimate_log, sd_log, ~ stats::qlnorm(c(q_lower, q_upper), .x, .y))
+    ci <- purrr::map2(estimate_log, sd_log, ~ stats::qlnorm(c(q_lower, q_upper), .x, .y))
   } else {
     # user chose normal distribution
     sd <- sqrt(variance)
@@ -119,12 +120,12 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 
 #' Calculate a Poisson distribution confidence interval
 #'
-#' @description Calculate a Poisson distribution confidence interval. This function
-#' imitates [stats::qpois()] using [stats::qchisq()] to allow for the continuous
-#' extension of the estimate.
+#' @description Calculate a Poisson distribution confidence interval. This
+#' function imitates [stats::qpois()] using [stats::qchisq()] to allow for the
+#' continuous extension of the estimate.
 #'
-#' @param interval A scalar between 0 and 1, indicating the width of the interval.
-#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param interval A scalar between 0 and 1, indicating the width of the
+#' interval. For example, use 0.95 to calculate a 95% confidence interval.
 #' @param x A numeric vector containing the stratum-specific number of events or
 #' the observed number of events in the study population.
 #' @param y A numeric vector containing the population-time for each stratum or
@@ -193,8 +194,14 @@ get_ci_pois <- function(interval, x, y) {
     stop("`y` must be numeric")
   }
 
-  if (length(y) != 1 & length(y) != length(x)) {
-    stop("length of `y` is not compatible with that of `x`")
+  if (length(x) != length(y)) {
+    if (length(y) == 1) {
+      if (y != 1) {
+        stop("expected `y = 1` given length of `x` and `y`") # avoid recycling values other than 1
+      }
+    } else {
+      stop("length of `y` is not compatible with that of `x`")
+    }
   }
 
   # determine quantiles of interest
@@ -218,18 +225,19 @@ get_ci_pois <- function(interval, x, y) {
 #' @description Derive an approximate gamma distribution confidence interval
 #' using [stats::qchisq()].
 #'
-#' @param interval A scalar between 0 and 1, indicating the width of the interval.
-#' For example, use 0.95 to calculate a 95% confidence interval.
+#' @param interval A scalar between 0 and 1, indicating the width of the
+#' interval. For example, use 0.95 to calculate a 95% confidence interval.
 #' @param estimate A numeric vector containing the point estimates.
 #' @param weights A list of numeric vectors containing the weights.
 #' @param variance A numeric vector containing the variances.
 #' @param method A string to indicate which method to use to calculate the
-#' confidence interval. The default is `"tcz06"` which refers to the method proposed
-#' by Tiwari, Clegg, and Zou (2006). Use `"ff97"` for a more conservative confidence
-#' interval proposed by Fay and Feuer (1997).
+#' confidence interval. The default is `"tcz06"` which refers to the method
+#' proposed by Tiwari, Clegg, and Zou (2006). Use `"ff97"` for a more
+#' conservative confidence interval proposed by Fay and Feuer (1997).
 #'
-#' @details This function assumes that the values of the input arguments `estimate`,
-#' `weights`, and `variance` are aligned and that they are the same length.
+#' @details This function assumes that the values of the input arguments
+#' `estimate`, `weights`, and `variance` are aligned and that they are the same
+#' length.
 #'
 #' This function is used to add confidence intervals in [get_ds_rt()].
 #'

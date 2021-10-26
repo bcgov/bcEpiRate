@@ -1,20 +1,20 @@
 #' Perform indirect rate standardization
 #'
 #' @description Compute a standardized mortality ratio (SMR) or expected number
-#' of deaths given the number of observed deaths, the size of each stratum in the
-#' observed population, and the specific rate for each stratum in the standard
-#' population.
+#' of deaths given the number of observed deaths, the size of each stratum in
+#' the observed population, and the specific rate for each stratum in the
+#' standard population.
 #'
 #' @param count A scalar, the number of observed deaths.
 #' @param popn A numeric vector containing the size of each defined population.
 #' @param std_rt A numeric vector containing the specific rate (expressed as
 #' the number of cases per unit of population) for each stratum in the standard
 #' population.
-#' @param output_type If `"ratio"` (default), only the SMR is returned. If `"counts"`,
-#' the expected number of deaths for each stratum in the observed population is
-#' returned as a vector.
-#' @param percent If `FALSE` (default), the SMR is returned as is (e.g. 0.5). If `TRUE`, the
-#' SMR is expressed as a percentage (e.g. 50).
+#' @param output_type If `"ratio"` (default), only the SMR is returned. If
+#' `"counts"`, the expected number of deaths for each stratum in the observed
+#' population is returned as a vector.
+#' @param percent If `FALSE` (default), the SMR is returned as is (e.g. 0.5).
+#' If `TRUE`, the SMR is expressed as a percentage (e.g. 50).
 #'
 #' @details This low-level function assumes that the size of each stratum in the
 #' observed population and the specific rate for the respective stratum in the

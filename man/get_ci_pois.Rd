@@ -7,8 +7,8 @@
 get_ci_pois(interval, x, y)
 }
 \arguments{
-\item{interval}{A scalar between 0 and 1, indicating the width of the interval.
-For example, use 0.95 to calculate a 95\% confidence interval.}
+\item{interval}{A scalar between 0 and 1, indicating the width of the
+interval. For example, use 0.95 to calculate a 95\% confidence interval.}
 
 \item{x}{A numeric vector containing the stratum-specific number of events or
 the observed number of events in the study population.}
@@ -21,9 +21,9 @@ A data frame with columns \code{lower} and \code{upper} which contain the lower
 and upper limits of a confidence interval respectively.
 }
 \description{
-Calculate a Poisson distribution confidence interval. This function
-imitates \code{\link[stats:Poisson]{stats::qpois()}} using \code{\link[stats:Chisquare]{stats::qchisq()}} to allow for the continuous
-extension of the estimate.
+Calculate a Poisson distribution confidence interval. This
+function imitates \code{\link[stats:Poisson]{stats::qpois()}} using \code{\link[stats:Chisquare]{stats::qchisq()}} to allow for the
+continuous extension of the estimate.
 }
 \details{
 When working with rates, pass the stratum-specific

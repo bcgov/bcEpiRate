@@ -28,19 +28,24 @@ applied.}
 as a numeric vector. If \code{TRUE} a data frame containing both the rates and
 the validity of the corresponding elements in the input vectors is returned.}
 
-\item{dist}{A string to indicate the type of probability distribution for the confidence interval to follow.
-Can be one of the following: \code{"normal"}, \code{"log normal"}, or \code{"poisson"}. This parameter is case insensitive.}
+\item{dist}{A string to indicate the type of probability distribution for the
+confidence interval to follow. Can be one of the following: \code{"normal"},
+\code{"log normal"}, or \code{"poisson"}. This parameter is case insensitive.}
 
-\item{interval}{A scalar, between 0 and 1, indicating the width of the confidence interval.
-For example, for a 95\% confidence interval, use \code{interval = 0.95}.}
+\item{interval}{A scalar, between 0 and 1, indicating the width of the
+confidence interval. For example, for a 95\% confidence interval, use
+\code{interval = 0.95}.}
 }
 \value{
-If \code{output_status = FALSE} and neither \code{dist} or \code{interval} is supplied, a numeric vector is returned.
+If \code{output_status = FALSE} and neither \code{dist} or \code{interval} is supplied, a
+numeric vector is returned.
 
-Otherwise, a data frame is returned with a column for \code{rate} and up to 4 additional columns:
+Otherwise, a data frame is returned with a column for \code{rate} and up to 4
+additional columns:
 \itemize{
 \item If \code{output_status = TRUE}, then the column \code{status} is included.
-\item If both \code{dist} and \code{interval} are provided, then the columns \code{interval}, \code{lower}, and \code{upper} are also included.
+\item If both \code{dist} and \code{interval} are provided, then the columns \code{interval},
+\code{lower}, and \code{upper} are also included.
 }
 }
 \description{
@@ -62,9 +67,11 @@ was NA.
 fraction were valid numbers.
 }
 
-To construct confidence intervals for the rate estimates, arguments must be supplied to both \code{dist} and \code{interval}.
-In general, \emph{the normal distribution should not be used to construct confidence intervals when the standard deviation
-is greater than a third of the mean}. The function throws a warning if this is the case.
+To construct confidence intervals for the rate estimates, arguments must be
+supplied to both \code{dist} and \code{interval}. In general, \emph{the normal distribution
+should not be used to construct confidence intervals when the standard
+deviation is greater than a third of the mean}. A warning is raised if this
+is the case.
 }
 \examples{
 \dontrun{
