@@ -35,12 +35,11 @@
 #' @param interval A scalar, between 0 and 1, indicating the width of the
 #' confidence interval. For example, for a 95% confidence interval, use
 #' `interval = 0.95`.
-#' @param method A string specifying the method to use when calculating
-#' confidence intervals based on the gamma distribution. Use `"tcz06"` (default)
-#' for the method proposed by Tiwari, Clegg, and Zou (2006) and `"ff97"` for the
-#' more conservative method proposed by Fay and Feuer (1997). This parameter
-#' must be left empty when calculating confidence intervals using other
-#' distributions.
+#' @param method A string specifying the method to use when using gamma
+#' distribution. Use `"tcz06"` (default) for the method proposed by Tiwari,
+#' Clegg, and Zou (2006) and `"ff97"` for the more conservative method proposed
+#' by Fay and Feuer (1997). This parameter must be left empty when calculating
+#' confidence intervals using other distributions.
 #'
 #' @details This low-level function assumes that the counts in each stratum,
 #' the size of each stratum in the observed population and the size of each
@@ -78,11 +77,13 @@
 #' get_ds_rt(counts, popn, std_popn, output_type = "counts")
 #' get_ds_rt(counts, popn, std_popn, clean_strata = "exclude")
 #' get_ds_rt(
-#'   counts, popn, std_popn, scale = 1000,
+#'   counts, popn, std_popn,
+#'   scale = 1000,
 #'   dist = "normal", interval = 0.95
 #' )
 #' get_ds_rt(
-#'   counts, popn, std_popn, scale = 100000,
+#'   counts, popn, std_popn,
+#'   scale = 100000,
 #'   dist = "gamma", interval = 0.9, method = "ff97"
 #' )
 #'
@@ -212,6 +213,13 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     # check validity of distribution name calculate confidence interval
     dist_name <- get_dist_name(dist)
     variance <- get_ds_rt_var(df)
+
+    if (dist_name %in% c("normal", "lognormal")) {
+      if (!is.null(method)) {
+        stop("`method` must be NULL when `dist` is 'normal' or 'lognormal'")
+      }
+    }
+
     if (dist_name == "normal") {
       df_dsr <- df_dsr %>%
         dplyr::mutate(
@@ -229,8 +237,10 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         list()
 
       df_dsr <- df_dsr %>%
-        dplyr::mutate(get_ci_gamma(interval = interval, estimate = .data$dsr, weights = weights,
-                                   variance = variance, method = method))
+        dplyr::mutate(get_ci_gamma(
+          interval = interval, estimate = .data$dsr, weights = weights,
+          variance = variance, method = method
+        ))
     } else {
       stop("`dist` should be one of 'normal', 'log normal', or 'gamma'")
     }

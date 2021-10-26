@@ -9,7 +9,7 @@ std_popn_a <- c(807, 355, 379, 244, 781) # unproblematic
 std_popn_b <- c(0, 355, 379, 244, 781) # contains 0 in STRATUM 1
 std_popn_c <- c(NA, 355, 379, 244, 781) # contains NA in STRATUM 1
 
-# TEST ABILITY TO CALCULATE DIRECTLY STANDARDIZED RATE
+# Test ability to calculate directly standardized rates ------------------------
 
 test_that("directly standardized rate can be calculated when all arguments are valid", {
   expect_equal(get_ds_rt(counts_a, popn_a, std_popn_a, scale = 1000), 24.20012, tolerance = 1e-6)
@@ -273,7 +273,7 @@ test_that("edge cases are handled properly", {
   expect_true(is.na(suppressWarnings(get_ds_rt(counts_d, popn_d, std_popn_d, clean_strata = "zero"))))
 })
 
-# TEST ABILITY TO CONSTRUCT CONFIDENCE INTERVALS
+# Test ability to construct confidence intervals ---------------------------
 
 test_that("function throws an error when `dist` is supplied, but not `interval`, and vice versa", {
   expect_error(
@@ -290,6 +290,13 @@ test_that("function throws an error when user provides unsupported distribution 
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, dist = "poisson", interval = 0.95),
     "`dist` should be one of 'normal', 'log normal', or 'gamma'"
+  )
+})
+
+test_that("function throws an error when `method` is provided for (log) normal", {
+  expect_error(
+    get_ds_rt(counts_a, popn_a, std_popn_a, dist = "normal", interval = 0.9, method = "ff97"),
+    "`method` must be NULL when `dist` is 'normal' or 'lognormal'"
   )
 })
 

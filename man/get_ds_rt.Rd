@@ -57,12 +57,11 @@ confidence interval to follow. Can be either \code{"normal"}, \code{"log normal"
 confidence interval. For example, for a 95\% confidence interval, use
 \code{interval = 0.95}.}
 
-\item{method}{A string specifying the method to use when calculating
-confidence intervals based on the gamma distribution. Use \code{"tcz06"} (default)
-for the method proposed by Tiwari, Clegg, and Zou (2006) and \code{"ff97"} for the
-more conservative method proposed by Fay and Feuer (1997). This parameter
-must be left empty when calculating confidence intervals using other
-distributions.}
+\item{method}{A string specifying the method to use when using gamma
+distribution. Use \code{"tcz06"} (default) for the method proposed by Tiwari,
+Clegg, and Zou (2006) and \code{"ff97"} for the more conservative method proposed
+by Fay and Feuer (1997). This parameter must be left empty when calculating
+confidence intervals using other distributions.}
 }
 \value{
 If \code{output_type = "rate"} (default) and neither \code{dist} or \code{interval} is
@@ -104,11 +103,13 @@ get_ds_rt(counts, popn, std_popn, power = 3)
 get_ds_rt(counts, popn, std_popn, output_type = "counts")
 get_ds_rt(counts, popn, std_popn, clean_strata = "exclude")
 get_ds_rt(
-  counts, popn, std_popn, scale = 1000,
+  counts, popn, std_popn,
+  scale = 1000,
   dist = "normal", interval = 0.95
 )
 get_ds_rt(
-  counts, popn, std_popn, scale = 100000,
+  counts, popn, std_popn,
+  scale = 100000,
   dist = "gamma", interval = 0.9, method = "ff97"
 )
 
