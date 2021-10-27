@@ -4,17 +4,18 @@
 \alias{get_ci_pois}
 \title{Calculate a Poisson distribution confidence interval}
 \usage{
-get_ci_pois(interval, x, y)
+get_ci_pois(interval, x, y = 1)
 }
 \arguments{
 \item{interval}{A scalar between 0 and 1, indicating the width of the
 interval. For example, use 0.95 to calculate a 95\% confidence interval.}
 
-\item{x}{A numeric vector containing the stratum-specific number of events or
-the observed number of events in the study population.}
+\item{x}{A numeric vector of positive integers. It can contain the
+stratum-specific number of events or the observed number of events in the
+study population.}
 
-\item{y}{A numeric vector containing the population-time for each stratum or
-the expected number of events.}
+\item{y}{A vector of positive values. It can contain the population-time for
+each stratum or the expected number of events. The default value is \code{1}.}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
@@ -33,8 +34,8 @@ number of events into \code{x} and the expected number of events into \code{y}. 
 that the values of \code{x} and \code{y} are aligned and that the vectors are the same
 length.
 
-Alternatively, to calculate a confidence interval for a rate, pass a vector
-of pre-calculated rates into \code{x} and set \code{y = 1}. The shorter vector \code{y} will
+To calculate a confidence interval around count data, pass a vector
+of counts into \code{x} and set \code{y = 1}. The shorter vector \code{y} will
 be repeated so that its length matches that of \code{x}.
 
 This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
@@ -42,8 +43,8 @@ This function is used to add confidence intervals in \code{\link[=get_spec_rt]{g
 \examples{
 \dontrun{
 # calculate a single confidence interval
-get_ci_pois(interval = 0.95, x = 49, y = 52)
-get_ci_pois(interval = 0.95, x = 11, y = 1)
+get_ci_pois(interval = 0.95, x = 49, y = 52) # rate
+get_ci_pois(interval = 0.95, x = 11) # count
 
 # use columns of a data frame as inputs
 df <- data.frame(x = c(24, 49), y = c(94, 52))

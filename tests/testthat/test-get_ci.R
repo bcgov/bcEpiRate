@@ -100,14 +100,29 @@ test_that("function throws an error when `interval` is invalid", {
   )
 })
 
-test_that("function throws an error when `x` or `y` is invalid", {
+test_that("function throws an error when `x` is invalid", {
   expect_error(
     get_ci_pois(interval = 0.95, x = "hello", y = 39570),
     "`x` must be numeric"
   )
   expect_error(
+    get_ci_pois(interval = 0.95, x = c(0.25, 0.07, 0.55), y = c(18864, 13649, 19479)),
+    "`x` must be a vector of integers"
+  )
+  expect_error(
+    get_ci_pois(interval = 0.95, x = c(-78, 12, 3), y = c(18864, 13649, 19479)),
+      "`x` must be a vector of positive values"
+    )
+})
+
+test_that("function throws an error when `x` or `y` is invalid", {
+  expect_error(
     get_ci_pois(interval = 0.95, x = 97, y = "hello"),
     "`y` must be numeric"
+  )
+  expect_error(
+    get_ci_pois(interval = 0.95, x = c(78, 12, 3), y = c(-18864, 13649, 19479)),
+                "`y` must be a vector of positive values"
   )
 })
 
@@ -144,7 +159,7 @@ test_that("function can calculate multiple Poisson confidence intervals", {
   )
 })
 
-# TODO y = 1
+# TODO add check on count data
 
 # Test ability to calculate Poisson confidence intervals -----------------------
 

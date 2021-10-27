@@ -126,10 +126,11 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the
 #' interval. For example, use 0.95 to calculate a 95% confidence interval.
-#' @param x A numeric vector containing the stratum-specific number of events or
-#' the observed number of events in the study population.
-#' @param y A numeric vector containing the population-time for each stratum or
-#' the expected number of events.
+#' @param x A numeric vector of positive integers. It can contain the
+#' stratum-specific number of events or the observed number of events in the
+#' study population.
+#' @param y A vector of positive values. It can contain the population-time for
+#' each stratum or the expected number of events. The default value is `1`.
 #'
 #' @details When working with rates, pass the stratum-specific
 #' number of events into `x` and the population-time for each stratum into `y`.
@@ -138,8 +139,8 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 #' that the values of `x` and `y` are aligned and that the vectors are the same
 #' length.
 #'
-#' Alternatively, to calculate a confidence interval for a rate, pass a vector
-#' of pre-calculated rates into `x` and set `y = 1`. The shorter vector `y` will
+#' To calculate a confidence interval around count data, pass a vector
+#' of counts into `x` and set `y = 1`. The shorter vector `y` will
 #' be repeated so that its length matches that of `x`.
 #'
 #' This function is used to add confidence intervals in [get_spec_rt()].
@@ -150,8 +151,8 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 #' @examples
 #' \dontrun{
 #' # calculate a single confidence interval
-#' get_ci_pois(interval = 0.95, x = 49, y = 52)
-#' get_ci_pois(interval = 0.95, x = 11, y = 1)
+#' get_ci_pois(interval = 0.95, x = 49, y = 52) # rate
+#' get_ci_pois(interval = 0.95, x = 11) # count
 #'
 #' # use columns of a data frame as inputs
 #' df <- data.frame(x = c(24, 49), y = c(94, 52))
@@ -169,7 +170,7 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci_pois <- function(interval, x, y) {
+get_ci_pois <- function(interval, x, y = 1) {
   # TODO integrate Poisson CI into function that calculates SMR
 
   # check validity of inputs
@@ -190,8 +191,20 @@ get_ci_pois <- function(interval, x, y) {
     stop("`x` must be numeric")
   }
 
+  if (!all(x %% 1 == 0, na.rm = TRUE)) {
+    stop("`x` must be a vector of integers")
+  }
+
+  if (!all(x > 0, na.rm = TRUE)) {
+    stop("`x` must be a vector of positive values")
+  }
+
   if (!is.numeric(y)) {
     stop("`y` must be numeric")
+  }
+
+  if (!all(y > 0, na.rm = TRUE)) {
+    stop("`y` must be a vector of positive values")
   }
 
   if (length(x) != length(y)) {
