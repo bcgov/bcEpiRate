@@ -37,10 +37,10 @@ This function is used to add confidence intervals in \code{\link[=get_spec_rt]{g
 get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = 0.05)
 
 # calculate multiple confidence interval
-get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = c(0.2, 0.4))
+get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
 
 # use columns of a data frame as inputs
-df <- data.frame(estimate = c(0.2, 0.4), variance_log = c(0.2, 0.4))
+df <- data.frame(estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
 
 # using dplyr
 df \%>\%

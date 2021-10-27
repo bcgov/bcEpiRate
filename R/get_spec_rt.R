@@ -142,11 +142,12 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
   if (!is.null(dist) & !is.null(interval)) {
     # check validity of distribution name and calculate confidence interval
     dist_name <- get_dist_name(dist)
-    variance <- result$rate / popn
     if (dist_name == "normal") {
-      ci <- get_ci_norm(interval = interval, estimate = result$rate, variance = variance)
+      var <- result$rate / popn
+      ci <- get_ci_norm(interval = interval, estimate = result$rate, variance = var)
     } else if (dist_name == "lognormal") {
-      ci <- get_ci_norm(interval = interval, estimate = result$rate, variance = variance, log = TRUE)
+      var_log <- 1 / counts
+      ci <- get_ci_lnorm(interval = interval, estimate = result$rate, variance_log = var_log)
     } else if (dist_name == "poisson") {
       ci <- get_ci_pois(interval = interval, x = counts, y = popn)
     } else {

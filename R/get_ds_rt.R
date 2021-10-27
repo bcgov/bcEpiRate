@@ -212,7 +212,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
 
     # check validity of distribution name calculate confidence interval
     dist_name <- get_dist_name(dist)
-    variance <- get_ds_rt_var(df)
+    var <- get_ds_rt_var(df)
 
     if (dist_name %in% c("normal", "lognormal")) {
       if (!is.null(method)) {
@@ -223,12 +223,13 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     if (dist_name == "normal") {
       df_dsr <- df_dsr %>%
         dplyr::mutate(
-          get_ci_norm(interval = interval, estimate = .data$dsr, variance = variance)
+          get_ci_norm(interval = interval, estimate = .data$dsr, variance = var)
         )
     } else if (dist_name == "lognormal") {
       df_dsr <- df_dsr %>%
         dplyr::mutate(
-          get_ci_norm(interval = interval, estimate = .data$dsr, variance = variance, log = TRUE)
+          var_log = (1 / (.data$dsr ** 2)) * var, # estimation found in Direct Standardization section of STDRATE Procedure Details
+          get_ci_lnorm(interval = interval, estimate = .data$dsr, variance = var_log)
         )
     } else if (dist_name == "gamma") {
       weights <- df %>%
@@ -244,7 +245,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
       df_dsr <- df_dsr %>%
         dplyr::mutate(get_ci_gamma(
           interval = interval, estimate = .data$dsr, weights = weights,
-          variance = variance, method = method
+          variance = var, method = method
         ))
     } else {
       stop("`dist` should be one of 'normal', 'log normal', or 'gamma'")
