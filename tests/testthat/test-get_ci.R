@@ -1,4 +1,4 @@
-# Test ability to calculate (log) normal confidence intervals ---------------------------
+# Test ability to calculate normal confidence intervals ---------------------------
 
 test_that("function throws an error when `interval` is invalid", {
   expect_error(
@@ -10,7 +10,7 @@ test_that("function throws an error when `interval` is invalid", {
     "`interval` must be a scalar"
   )
   expect_error(
-    get_ci_norm(interval = -1, estimate = 10, variance),
+    get_ci_norm(interval = -1, estimate = 10, variance = 4),
     "`interval` must be between 0 and 1"
   )
 })
@@ -40,36 +40,29 @@ test_that("function throws an error when length of `estimate` and `variance` don
   )
 })
 
-test_that("function throws an error when `log` is invalid", {
-  expect_error(
-    get_ci_norm(interval = 0.9, estimate = 10, variance = 4, log = "hello"),
-    "`log` must be logical"
-  )
-})
-
-lower_a <- 10 - qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(4)
-upper_a <- 10 + qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(4)
-df_a <- data.frame(lower = lower_a, upper = upper_a)
+df_norm <- data.frame(
+  lower = 10 - qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(4),
+  upper = 10 + qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(4)
+)
 
 test_that("function can calculate a single confidence interval using the normal distribution", {
   expect_equal(
     get_ci_norm(interval = 0.95, estimate = 10, variance = 4),
-    df_a
+    df_norm
   )
 })
 
-lower_b <- 20 - qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(9)
-upper_b <- 20 + qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(9)
-df_b <- data.frame(lower = lower_b, upper = upper_b)
+df_norm_02 <- data.frame(
+  lower = 20 - qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(9),
+  upper = 20 + qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(9)
+)
 
 test_that("function can calculate multiple confidence intervals using the normal distribution", {
   expect_equal(
     get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9)),
-    rbind(df_a, df_b)
+    rbind(df_norm, df_norm_02)
   )
 })
-
-# TODO log normal
 
 test_that("function throws a warning if the normal distribution should be avoided", {
   count <- 1
@@ -83,7 +76,72 @@ test_that("function throws a warning if the normal distribution should be avoide
   )
 })
 
-# Test ability to calculate Poisson confidence intervals ---------------------------
+# Test ability to calculate log normal confidence intervals --------------------
+test_that("function throws an error when `interval` is invalid", {
+  expect_error(
+    get_ci_lnorm(interval = "hello", estimate = 0.2, variance_log = 0.05),
+    "`interval` must be numeric"
+  )
+  expect_error(
+    get_ci_lnorm(interval = c(0.9, 0.95), estimate = 0.2, variance_log = 0.05),
+    "`interval` must be a scalar"
+  )
+  expect_error(
+    get_ci_lnorm(interval = -1, estimate = 0.2, variance_log = 0.05),
+    "`interval` must be between 0 and 1"
+  )
+})
+
+test_that("function throws an error when `estimate` is invalid", {
+  expect_error(
+    get_ci_lnorm(interval = 0.95, estimate = "hello", variance_log = 0.05),
+    "`estimate` must be numeric"
+  )
+})
+
+test_that("function throws an error when `variance_log` is invalid", {
+  expect_error(
+    get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = "hello"),
+    "`variance_log` must be numeric"
+  )
+})
+
+test_that("function throws an error when length of `estimate` and `variance_log` don't match", {
+  expect_error(
+    get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = 0.05),
+    "length of `variance_log` must be equal to length of `estimate`"
+  )
+})
+
+df_lnorm <- data.frame(
+  lower = (log(0.4) - qnorm(p = 1 - (0.05 / 2)) * sqrt(0.025)) %>%
+    exp(),
+  upper = (log(0.4) + qnorm(p = 1 - (0.05 / 2)) * sqrt(0.025)) %>%
+    exp()
+)
+
+test_that("function can calculate a log normal confidence interval", {
+  expect_equal(
+    get_ci_lnorm(interval = 0.95, estimate = 0.4, variance_log = 0.025),
+    df_lnorm
+  )
+})
+
+df_lnorm_02 <- data.frame(
+  lower = (log(0.25) - qnorm(p = 1 - (0.05 / 2)) * sqrt(0.04)) %>%
+    exp(),
+  upper = (log(0.25) + qnorm(p = 1 - (0.05 / 2)) * sqrt(0.04)) %>%
+    exp()
+)
+
+test_that("function can calculate multiple log normal confidence intervals", {
+  expect_equal(
+    get_ci_lnorm(interval = 0.95, estimate = c(0.4, 0.25), variance_log = c(0.025, 0.04)),
+    rbind(df_lnorm, df_lnorm_02)
+  )
+})
+
+# Test ability to calculate Poisson confidence intervals -----------------------
 
 test_that("function throws an error when `interval` is invalid", {
   expect_error(
@@ -111,8 +169,8 @@ test_that("function throws an error when `x` is invalid", {
   )
   expect_error(
     get_ci_pois(interval = 0.95, x = c(-78, 12, 3), y = c(18864, 13649, 19479)),
-      "`x` must be a vector of positive values"
-    )
+    "`x` must be a vector of positive values"
+  )
 })
 
 test_that("function throws an error when `x` or `y` is invalid", {
@@ -122,7 +180,7 @@ test_that("function throws an error when `x` or `y` is invalid", {
   )
   expect_error(
     get_ci_pois(interval = 0.95, x = c(78, 12, 3), y = c(-18864, 13649, 19479)),
-                "`y` must be a vector of positive values"
+    "`y` must be a vector of positive values"
   )
 })
 
@@ -137,29 +195,33 @@ test_that("function throws an error when length of `x` and `y` are incompatbile"
   )
 })
 
-lower_c <- (stats::qchisq(p = 0.05 / 2, df = 2 * 97)) / (2 * 39570)
-upper_c <- (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (97 + 1))) / (2 * 39570)
-df_c <- data.frame(lower = lower_c, upper = upper_c)
+df_pois <- data.frame(
+  lower = (stats::qchisq(p = 0.05 / 2, df = 2 * 97)) / (2 * 39570),
+  upper = (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (97 + 1))) / (2 * 39570)
+)
 
 test_that("function can calculate a Poisson confidence interval", {
   expect_equal(
     get_ci_pois(interval = 0.95, x = 97, y = 39570),
-    df_c
+    df_pois
   )
 })
 
-lower_d <- (stats::qchisq(p = 0.05 / 2, df = 2 * 50)) / (2 * 47516)
-upper_d <- (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (50 + 1))) / (2 * 47516)
-df_d <- data.frame(lower = lower_d, upper = upper_d)
+df_pois_02 <- data.frame(
+  lower = (stats::qchisq(p = 0.05 / 2, df = 2 * 50)) / (2 * 47516),
+  upper = (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (50 + 1))) / (2 * 47516)
+)
 
 test_that("function can calculate multiple Poisson confidence intervals", {
   expect_equal(
     get_ci_pois(interval = 0.95, x = c(97, 50), y = c(39570, 47516)),
-    rbind(df_c, df_d)
+    rbind(df_pois, df_pois_02)
   )
 })
 
 # TODO add check on count data
+
+# TODO add tests for get_ci_gamma
 
 # Test ability to calculate Poisson confidence intervals -----------------------
 

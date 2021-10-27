@@ -1,13 +1,11 @@
-#' Calculate a (log) normal distribution confidence interval
+#' Calculate a normal distribution confidence interval
 #'
-#' @description Calculate a (log) normal distribution confidence interval.
+#' @description Calculate a normal distribution confidence interval.
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the
-#' interval. For example, use 0.95 to calculate a 95% confidence interval.
+#' interval. For example, use `0.95` to calculate a 95% confidence interval.
 #' @param estimate A numeric vector containing the point estimates.
 #' @param variance A numeric vector containing the variances.
-#' @param log A Boolean to indicate whether to use the log normal distribution.
-#' The default value is `FALSE`.
 #'
 #' @details This function doesn't need to know which type of epidemiological
 #' measure has been passed to `estimate` (e.g., rate, risk). It also assumes
@@ -26,7 +24,6 @@
 #' \dontrun{
 #' # calculate a single confidence interval
 #' get_ci_norm(interval = 0.95, estimate = 10, variance = 4)
-#' get_ci_norm(interval = 0.9, estimate = 20, variance = 9, log = TRUE)
 #'
 #' # calculate multiple confidence intervals
 #' get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9))
@@ -45,9 +42,8 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
+get_ci_norm <- function(interval, estimate, variance) {
   # TODO integrate normal CI into functions that calculate risk, standardized risk, SMR, rate difference, and risk difference
-  # TODO integrate log normal CI into functions that calculate risk, standardized risk, SMR, rate ratio, and risk ratio
 
   # check validity of inputs
 
@@ -79,43 +75,119 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
     stop("length of `variance` must be equal to length of `estimate`")
   }
 
-  if (!is.logical(log)) {
-    stop("`log` must be logical")
-  }
-
-  # determine quantiles of interest
+  # define alpha
   alpha <- 1 - interval
-  q_upper <- 1 - (alpha / 2)
-  q_lower <- alpha / 2
 
-  if (log) {
-    # user chose log normal distribution
-    # transformation based on https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/comment-page-1/
-    estimate_log <- log(estimate**2 / sqrt(estimate**2 + variance))
-    sd_log <- sqrt(log(1 + (variance / estimate**2)))
-    ci <- purrr::map2(estimate_log, sd_log, ~ stats::qlnorm(c(q_lower, q_upper), .x, .y))
-  } else {
-    # user chose normal distribution
-    sd <- sqrt(variance)
-
-    # check if distribution should be avoided
-    threshold <- (1 - 0.997) / 2
-    mass_below_0 <- stats::pnorm(0, mean = estimate, sd = sd)
-    if (any(mass_below_0 > threshold, na.rm = TRUE)) {
-      warning("more than 0.15% of the probability mass lies below 0 for at least one of the estimates, consider using a different probability distribution")
-    }
-
-    ci <- purrr::map2(estimate, sd, ~ stats::qnorm(c(q_lower, q_upper), .x, .y))
+  # check if distribution should be avoide
+  sd <- sqrt(variance)
+  threshold <- (1 - 0.997) / 2
+  mass_below_0 <- stats::pnorm(0, mean = estimate, sd = sd)
+  if (any(mass_below_0 > threshold, na.rm = TRUE)) {
+    warning("more than 0.15% of the probability mass lies below 0 for at least one of the estimates, consider using a different probability distribution")
   }
 
-  # wrangle output
-  result <- ci %>%
-    data.frame() %>%
-    data.table::transpose() %>%
-    dplyr::rename(lower = 1, upper = 2)
+  # follow SAS implementation
+  result <- data.frame(
+    lower = estimate - stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sd,
+    upper = estimate + stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sd
+  ) %>%
+    dplyr::select(lower, upper)
+
+  # result <- purrr::map2(estimate, sqrt(variance), ~ stats::qnorm(c((alpha/2), 1 - (alpha/2)), .x, .y)) %>%
+  #   data.frame() %>%
+  #   data.table::transpose() %>%
+  #   dplyr::rename(lower = 1, upper = 2)
 
   return(result)
 }
+
+#' Calculate a log normal distribution confidence interval
+#'
+#' @description Calculate a log normal distribution confidence interval
+#'
+#' @param interval A scalar between 0 and 1, indicating the width of the
+#' interval. For example, use `0.95` to calculate a 95% confidence interval.
+#' @param estimate A numeric vector containing the point estimates.
+#' @param variance_log A numeric vector containing the variances of the
+#' log-transformed `estimate`.
+#'
+#' @details This function doesn't need to know which type of epidemiological
+#' measure has been passed to `estimate` (e.g., rate, risk). It also assumes
+#' that the values of the input arguments `estimate` and `variance_log` are aligned
+#' and that the vectors are the same length.
+#'
+#' This function is used to add confidence intervals in [get_spec_rt()] and
+#' [get_ds_rt()].
+#'
+#' @return A data frame with columns `lower` and `upper` which contain the lower
+#' and upper limits of a confidence interval respectively.
+#'
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+#'
+#' @examples
+#' \dontrun{
+#' # calculate a single confidence interval
+#' get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = 0.05)
+#'
+#' # calculate multiple confidence interval
+#' get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
+#'
+#' # use columns of a data frame as inputs
+#' df <- data.frame(estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
+#'
+#' # using dplyr
+#' df %>%
+#'   dplyr::mutate(get_ci_lnorm(0.975, estimate, variance_log))
+#'
+#' # using base
+#' get_ci_lnorm(interval = 0.975, estimate = df$estimate, variance_log = df$variance_log)
+#' }
+#'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @export
+get_ci_lnorm <- function(interval, estimate, variance_log) {
+  # TODO integrate log normal CI into functions that calculate risk, standardized risk, SMR, rate ratio, and risk ratio
+  # check validity of inputs
+
+  if (!is.numeric(interval)) {
+    stop("`interval` must be numeric")
+  }
+
+  if (length(interval) != 1) {
+    stop("`interval` must be a scalar")
+  }
+
+  if (interval < 0 | 1 < interval) {
+    stop("`interval` must be between 0 and 1")
+  }
+
+  if (!is.numeric(estimate)) {
+    stop("`estimate` must be numeric")
+  }
+
+  if (!is.numeric(variance_log)) {
+    stop("`variance_log` must be numeric")
+  }
+
+  # TODO check if variance_log > 0
+
+  if (length(estimate) != length(variance_log)) {
+    stop("length of `variance_log` must be equal to length of `estimate`")
+  }
+
+  # define alpha
+  alpha <- 1 - interval
+
+  # follow SAS implementation
+  result <- data.frame(
+    lower = estimate * exp(-(qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))),
+    upper = estimate * exp(qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))
+  )
+
+  return(result)
+}
+
 
 
 #' Calculate a Poisson distribution confidence interval
@@ -125,7 +197,7 @@ get_ci_norm <- function(interval, estimate, variance, log = FALSE) {
 #' continuous extension of the estimate.
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the
-#' interval. For example, use 0.95 to calculate a 95% confidence interval.
+#' interval. For example, use `0.95` to calculate a 95% confidence interval.
 #' @param x A numeric vector of positive integers. It can contain the
 #' stratum-specific number of events or the observed number of events in the
 #' study population.
@@ -239,7 +311,7 @@ get_ci_pois <- function(interval, x, y = 1) {
 #' using [stats::qchisq()].
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the
-#' interval. For example, use 0.95 to calculate a 95% confidence interval.
+#' interval. For example, use `0.95` to calculate a 95% confidence interval.
 #' @param estimate A numeric vector containing the point estimates.
 #' @param weights A list of numeric vectors containing the weights.
 #' @param variance A numeric vector containing the variances.
@@ -369,7 +441,7 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
 #' match, an error is thrown.
 #'
 #' @keywords internal
-get_dist_name  <- function(dist) {
+get_dist_name <- function(dist) {
   if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) {
     name <- "normal"
   } else if (stringr::str_detect(dist, stringr::regex("^log(-|\\s)?normal$", ignore_case = TRUE))) {

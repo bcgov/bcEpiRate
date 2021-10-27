@@ -8,7 +8,7 @@ get_ci_pois(interval, x, y = 1)
 }
 \arguments{
 \item{interval}{A scalar between 0 and 1, indicating the width of the
-interval. For example, use 0.95 to calculate a 95\% confidence interval.}
+interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 
 \item{x}{A numeric vector of positive integers. It can contain the
 stratum-specific number of events or the observed number of events in the

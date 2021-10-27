@@ -2,6 +2,7 @@
 
 export(get_ci)
 export(get_ci_gamma)
+export(get_ci_lnorm)
 export(get_ci_norm)
 export(get_ci_pois)
 export(get_ds_rt)
