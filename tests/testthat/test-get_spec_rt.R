@@ -174,6 +174,18 @@ test_that("function outputs expected statuses", {
 })
 
 # Test ability to calculate confidence intervals ---------------------------
+
+test_that("function throws an error when `dist` is supplied, but not `interval`, and vice versa", {
+  expect_error(
+    get_spec_rt(counts, popn, power = 3, interval = 0.95),
+    "both `dist` and `interval` must be supplied to construct confidence intervals"
+  )
+  expect_error(
+    get_spec_rt(counts, popn, power = 3, dist = "normal"),
+    "both `dist` and `interval` must be supplied to construct confidence intervals"
+  )
+})
+
 test_that("function throws an error when user provides unsupported distribution name", {
   expect_error(
     get_spec_rt(counts = counts, popn = popn, power = 5, dist = "gamma", interval = 0.9),
@@ -236,17 +248,6 @@ test_that("limits are NA when specific rates evaluate to NA", {
     dplyr::pull(is_expected) %>%
     all() %>%
     expect_true()
-})
-
-test_that("function throws an error when `dist` is supplied, but not `interval`, and vice versa", {
-  expect_error(
-    get_spec_rt(counts, popn, power = 3, interval = 0.95),
-    "both `dist` and `interval` must be supplied to construct confidence intervals"
-  )
-  expect_error(
-    get_spec_rt(counts, popn, power = 3, dist = "normal"),
-    "both `dist` and `interval` must be supplied to construct confidence intervals"
-  )
 })
 
 test_that("multipliers are applied correctly", {

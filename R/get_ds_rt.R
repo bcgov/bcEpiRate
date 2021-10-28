@@ -123,12 +123,32 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     stop("`output_type` must be either 'rate' or 'counts'")
   }
 
+  if (!is.null(scale) & !is.null(power)) {
+    stop("must supply exactly one of `scale` and `power`")
+  }
+
   # set multiplier
-  if (!is.null(scale)) {
+  if (!is.null(scale)) { # if only `scale` is supplied
+    if (length(scale) != 1) {
+      stop("`scale` must be a single number")
+    }
+
+    if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
+      stop("`scale` must be a positive whole number")
+    }
+
     multiplier <- scale
-  } else if (!is.null(power)) {
+  } else if (!is.null(power)) { # if only `power` is supplied
+    if (length(power) != 1) {
+      stop("`power` must be a single number")
+    }
+
+    if (power %% 1 != 0 | power < 0 | is.na(power)) {
+      stop("`power` must be a non-negative whole number")
+    }
+
     multiplier <- 10**power
-  } else {
+  } else { # if neither `scale` nor `power` is supplied, return the estimates as is (i.e. `scale` = 1)
     multiplier <- 1
   }
 
@@ -228,7 +248,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     } else if (dist_name == "lognormal") {
       df_dsr <- df_dsr %>%
         dplyr::mutate(
-          var_log = (1 / (.data$dsr ** 2)) * var, # estimation found in Direct Standardization section of STDRATE Procedure Details
+          var_log = (1 / (.data$dsr**2)) * var, # estimation found in Direct Standardization section of STDRATE Procedure Details
           get_ci_lnorm(interval = interval, estimate = .data$dsr, variance_log = .data$var_log)
         )
     } else if (dist_name == "gamma") {

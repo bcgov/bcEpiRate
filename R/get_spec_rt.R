@@ -105,24 +105,22 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
   }
 
   # set multiplier
-  if (!is.null(scale) & is.null(power)) { # if only `scale` is supplied
+  if (!is.null(scale)) { # if only `scale` is supplied
     if (length(scale) != 1) {
       stop("`scale` must be a single number")
     }
 
-    if (!isTRUE(all.equal(scale, round(scale, 0))) |
-      (scale < 1)) {
+    if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
       stop("`scale` must be a positive whole number")
     }
 
     multiplier <- scale
-  } else if (is.null(scale) & !is.null(power)) { # if only `power` is supplied
+  } else if (!is.null(power)) { # if only `power` is supplied
     if (length(power) != 1) {
       stop("`power` must be a single number")
     }
 
-    if (!isTRUE(all.equal(power, round(power, 0))) |
-      (power < 0)) {
+    if (power %% 1 != 0 | power < 0 | is.na(power)) {
       stop("`power` must be a non-negative whole number")
     }
 
@@ -157,7 +155,7 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     # add confidence interval to output
     result <- result %>%
       dplyr::mutate(lower = ci$lower, upper = ci$upper, interval = interval) %>%
-      dplyr::mutate( # overwrite limits with NA when `rate` is 0
+      dplyr::mutate( # overwrite limits with NA when `rate` is 0 (not applicable to Poisson)
         lower = dplyr::if_else(.data$rate == 0, NA_real_, .data$lower),
         upper = dplyr::if_else(.data$rate == 0, NA_real_, .data$upper)
       ) %>%

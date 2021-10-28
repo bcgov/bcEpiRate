@@ -51,6 +51,35 @@ test_that("error is thrown when `output_type` is not valid", {
   )
 })
 
+test_that("error is thrown when both `scale` and `power` are provided", {
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, scale = 1000, power = 3),
+               "must supply exactly one of `scale` and `power`")
+})
+
+test_that("error is thrown when `scale` is not a scalar", {
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, scale = c(1000, 100000)),
+               "`scale` must be a single number")
+})
+
+test_that("error is thrown when `scale` is not a positive integer", {
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, scale = 0),
+               "`scale` must be a positive whole number")
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, scale = 9999.99),
+               "`scale` must be a positive whole number")
+})
+
+test_that("error is thrown when `power` is not a scalar", {
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, power = c(3, 5)),
+               "`power` must be a single number")
+})
+
+test_that("error is thrown when `power` is not a non-negative integer", {
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, power = -1),
+               "`power` must be a non-negative whole number")
+  expect_error(get_ds_rt(counts_a, popn_a, std_popn_a, power = -3.5),
+               "`power` must be a non-negative whole number")
+})
+
 test_that("error is thrown when `clean_strata` is not valid", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, clean_strata = "hello"),

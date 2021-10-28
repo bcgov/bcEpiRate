@@ -101,6 +101,7 @@ get_ci_norm <- function(interval, estimate, variance) {
   return(result)
 }
 
+
 #' Calculate a log normal distribution confidence interval
 #'
 #' @description Calculate a log normal distribution confidence interval
@@ -187,7 +188,6 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 
   return(result)
 }
-
 
 
 #' Calculate a Poisson distribution confidence interval
