@@ -229,12 +229,12 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
       df_dsr <- df_dsr %>%
         dplyr::mutate(
           var_log = (1 / (.data$dsr ** 2)) * var, # estimation found in Direct Standardization section of STDRATE Procedure Details
-          get_ci_lnorm(interval = interval, estimate = .data$dsr, variance = var_log)
+          get_ci_lnorm(interval = interval, estimate = .data$dsr, variance_log = .data$var_log)
         )
     } else if (dist_name == "gamma") {
       weights <- df %>%
         dplyr::mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn)) %>%
-        dplyr::pull(w_j) %>%
+        dplyr::pull(.data$w_j) %>%
         list()
 
       # if user doesn't specify a method, use the default

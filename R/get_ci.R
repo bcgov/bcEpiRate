@@ -91,7 +91,7 @@ get_ci_norm <- function(interval, estimate, variance) {
     lower = estimate - stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sd,
     upper = estimate + stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sd
   ) %>%
-    dplyr::select(lower, upper)
+    dplyr::select(.data$lower, .data$upper)
 
   # result <- purrr::map2(estimate, sqrt(variance), ~ stats::qnorm(c((alpha/2), 1 - (alpha/2)), .x, .y)) %>%
   #   data.frame() %>%
@@ -181,8 +181,8 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 
   # follow SAS implementation
   result <- data.frame(
-    lower = estimate * exp(-(qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))),
-    upper = estimate * exp(qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))
+    lower = estimate * exp(-(stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))),
+    upper = estimate * exp(stats::qnorm(p = 1 - (alpha / 2), mean = 0, sd = 1) * sqrt(variance_log))
   )
 
   return(result)
@@ -299,7 +299,7 @@ get_ci_pois <- function(interval, x, y = 1) {
       lower = stats::qchisq(q_lower, df = 2 * x) / (2 * y),
       upper = stats::qchisq(q_upper, df = 2 * (x + 1)) / (2 * y)
     ) %>%
-    dplyr::select(lower, upper)
+    dplyr::select(.data$lower, .data$upper)
 
   return(result)
 }
@@ -415,7 +415,7 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
     dt <- dt %>%
       dplyr::mutate(
         w = purrr::map_dbl(weights, max), # w_x
-        w_sq = w**2
+        w_sq = .data$w**2
       ) # w_x**2
   }
 
@@ -423,11 +423,11 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
   dt <- dt %>%
     dplyr::mutate(
       df_lower = (2 * (estimate**2)) / variance,
-      df_upper = (2 * ((estimate + w)**2)) / (variance + w_sq),
-      lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, df_lower),
-      upper = ((variance + w_sq) / (2 * (estimate + w))) * stats::qchisq(q_upper, df_upper)
+      df_upper = (2 * ((estimate + .data$w)**2)) / (variance + .data$w_sq),
+      lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, .data$df_lower),
+      upper = ((variance + .data$w_sq) / (2 * (estimate + .data$w))) * stats::qchisq(q_upper, .data$df_upper)
     ) %>%
-    dplyr::select(lower, upper)
+    dplyr::select(.data$lower, .data$upper)
 
   return(dt)
 }
