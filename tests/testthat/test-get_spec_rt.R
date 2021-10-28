@@ -210,19 +210,6 @@ test_that("limits are NA when specific rates evaluate to 0", {
     all() %>%
     # should be all TRUE
     expect_true()
-
-  # using the Poisson distribution
-  get_spec_rt(counts_0, popn, dist = "poisson", interval = 0.99) %>%
-    dplyr::mutate(is_expected = dplyr::if_else(
-      rate == 0,
-      is.na(lower) & is.na(upper), # if rate is 0, check that limits are NA
-      is.finite(lower) & is.finite(upper)
-    )) %>%
-    # otherwise, check that limits are finite
-    dplyr::pull(is_expected) %>%
-    all() %>%
-    # should be all TRUE
-    expect_true()
 })
 
 test_that("limits are NA when specific rates evaluate to NA", {

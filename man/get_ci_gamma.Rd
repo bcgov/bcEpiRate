@@ -44,7 +44,7 @@ w_1 <- c(
   3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
   7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05
 )
-v_1 <- c(1e-06)
+v_1 <- 1e-06
 
 get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
 get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")

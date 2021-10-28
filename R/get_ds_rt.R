@@ -103,7 +103,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
 
   # check validity of inputs
 
-  if (length(unique(purrr::map(list(counts, popn, std_popn), length))) != 1) {
+  if (length(unique(purrr::map_dbl(list(counts, popn, std_popn), length))) != 1) {
     stop("input vectors must be the same length")
   }
 

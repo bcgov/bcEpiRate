@@ -339,7 +339,7 @@ get_ci_pois <- function(interval, x, y = 1) {
 #'   3.7e-05, 2.2e-05, 2.0e-05, 1.2e-05, 2.3e-05,
 #'   7.0e-05, 3.8e-05, 6.0e-05, 1.7e-05, 2.6e-05
 #' )
-#' v_1 <- c(1e-06)
+#' v_1 <- 1e-06
 #'
 #' get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
 #' get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
@@ -396,6 +396,10 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
     stop("`method` must be either 'tcz06' or 'ff97'")
   }
 
+  if (length(unique(purrr::map_dbl(list(estimate, weights, variance), length))) != 1) {
+    stop("length of `estimate`, `weights`, and `variance` must be the same")
+  }
+
   # determine quantiles of interest
   alpha <- 1 - interval
   q_lower <- alpha / 2
@@ -427,7 +431,8 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
       lower = (variance / (2 * estimate)) * stats::qchisq(q_lower, .data$df_lower),
       upper = ((variance + .data$w_sq) / (2 * (estimate + .data$w))) * stats::qchisq(q_upper, .data$df_upper)
     ) %>%
-    dplyr::select(.data$lower, .data$upper)
+    dplyr::select(.data$lower, .data$upper) %>%
+    as.data.frame() # coerce back to data.frame
 
   return(dt)
 }

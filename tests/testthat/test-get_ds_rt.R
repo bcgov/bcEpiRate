@@ -16,7 +16,7 @@ test_that("directly standardized rate can be calculated when all arguments are v
   expect_equal(get_ds_rt(counts_a, popn_a, std_popn_a, power = 3), 24.20012, tolerance = 1e-6)
 })
 
-test_that("error is thrown when inputs are of varying lengths", {
+test_that("error is thrown when lengths are incompatible", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a[1:4]),
     "input vectors must be the same length"
