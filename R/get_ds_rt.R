@@ -156,7 +156,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
   spec_rt <- get_spec_rt(counts, popn) %>%
     as.numeric()
 
-  df <- tibble::tibble(counts, popn, std_popn, spec_rt)
+  df <- data.frame(counts, popn, std_popn, spec_rt)
 
   # calculate directly standardized rate based on specified method
   if (clean_strata == "none") {
@@ -180,7 +180,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         ) %>%
         dplyr::select(.data$dsr)
     } else {
-      df_dsr <- tibble::tibble(dsr = NA_real_)
+      df_dsr <- data.frame(dsr = NA_real_)
     }
   } else if (clean_strata == "exclude") {
 
@@ -202,7 +202,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         ) %>%
         dplyr::select(.data$dsr)
     } else {
-      (df_dsr <- tibble::tibble(dsr = NA_real_))
+      (df_dsr <- data.frame(dsr = NA_real_))
     }
   } else if (clean_strata == "zero") {
     # set specific rate of NA to 0 then calculate expected counts
@@ -304,7 +304,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' df <- tibble::tibble(counts, popn, std_popn) %>%
+#' df <- data.frame(counts, popn, std_popn) %>%
 #'   dplyr::mutate(
 #'     spec_rt = get_spec_rt(counts, popn),
 #'     exp_counts = spec_rt * std_popn
