@@ -27,7 +27,7 @@ measure has been passed to \code{estimate} (e.g., rate, risk). It also assumes
 that the values of the input arguments \code{estimate} and \code{variance} are aligned
 and that the vectors are the same length.
 
-This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and
+This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and
 \code{\link[=get_ds_rt]{get_ds_rt()}}.
 }
 \examples{

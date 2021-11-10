@@ -52,7 +52,7 @@
 #' is the case.
 #'
 #' @return
-#' If `output_type = "rate"` (default) and neither `dist` or `interval` is
+#' If `output_type = "rate"` (default) and neither `dist` nor `interval` is
 #' supplied, the directly standardized rate is returned as a numeric vector.
 #'
 #' If `output_type = "rate"` and both `dist` and `interval` are provided, then a

@@ -19,11 +19,11 @@ interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 \item{method}{A string to indicate which method to use to calculate the
 confidence interval. The default is \code{"tcz06"} which refers to the method
 proposed by Tiwari, Clegg, and Zou (2006). Use \code{"ff97"} for a more
-conservative confidence interval proposed by Fay and Feuer (1997).}
+conservative (wider) confidence interval proposed by Fay and Feuer (1997).}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
-and upper limits of a confidence interval respectively.
+and upper limits of a confidence interval, respectively.
 }
 \description{
 Derive an approximate gamma distribution confidence interval
@@ -34,7 +34,7 @@ This function assumes that the values of the input arguments
 \code{estimate}, \code{weights}, and \code{variance} are aligned and that they are the same
 length.
 
-This function is used to add confidence intervals in \code{\link[=get_ds_rt]{get_ds_rt()}}.
+This function is used to construct confidence intervals in \code{\link[=get_ds_rt]{get_ds_rt()}}.
 }
 \examples{
 \dontrun{

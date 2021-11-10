@@ -64,7 +64,7 @@ by Fay and Feuer (1997). This parameter must be left empty when calculating
 confidence intervals using other distributions.}
 }
 \value{
-If \code{output_type = "rate"} (default) and neither \code{dist} or \code{interval} is
+If \code{output_type = "rate"} (default) and neither \code{dist} nor \code{interval} is
 supplied, the directly standardized rate is returned as a numeric vector.
 
 If \code{output_type = "rate"} and both \code{dist} and \code{interval} are provided, then a

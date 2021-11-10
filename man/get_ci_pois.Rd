@@ -38,7 +38,7 @@ To calculate a confidence interval around count data, pass a vector
 of counts into \code{x} and set \code{y = 1}. The shorter vector \code{y} will
 be repeated so that its length matches that of \code{x}.
 
-This function is used to add confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
+This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }
 \examples{
 \dontrun{

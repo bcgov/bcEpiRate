@@ -12,7 +12,7 @@
 #' that the values of the input arguments `estimate` and `variance` are aligned
 #' and that the vectors are the same length.
 #'
-#' This function is used to add confidence intervals in [get_spec_rt()] and
+#' This function is used to construct confidence intervals in [get_spec_rt()] and
 #' [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
@@ -117,7 +117,7 @@ get_ci_norm <- function(interval, estimate, variance) {
 #' that the values of the input arguments `estimate` and `variance_log` are aligned
 #' and that the vectors are the same length.
 #'
-#' This function is used to add confidence intervals in [get_spec_rt()] and
+#' This function is used to construct confidence intervals in [get_spec_rt()] and
 #' [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
@@ -215,7 +215,7 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #' of counts into `x` and set `y = 1`. The shorter vector `y` will
 #' be repeated so that its length matches that of `x`.
 #'
-#' This function is used to add confidence intervals in [get_spec_rt()].
+#' This function is used to construct confidence intervals in [get_spec_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
@@ -318,16 +318,16 @@ get_ci_pois <- function(interval, x, y = 1) {
 #' @param method A string to indicate which method to use to calculate the
 #' confidence interval. The default is `"tcz06"` which refers to the method
 #' proposed by Tiwari, Clegg, and Zou (2006). Use `"ff97"` for a more
-#' conservative confidence interval proposed by Fay and Feuer (1997).
+#' conservative (wider) confidence interval proposed by Fay and Feuer (1997).
 #'
 #' @details This function assumes that the values of the input arguments
 #' `estimate`, `weights`, and `variance` are aligned and that they are the same
 #' length.
 #'
-#' This function is used to add confidence intervals in [get_ds_rt()].
+#' This function is used to construct confidence intervals in [get_ds_rt()].
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
-#' and upper limits of a confidence interval respectively.
+#' and upper limits of a confidence interval, respectively.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
@@ -392,7 +392,10 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
     stop("`variance` must be numeric")
   }
 
-  if (!method %in% c("tcz06", "ff97")) {
+  if (stringr::str_detect(method,
+    stringr::regex("(^ff97)$|^(tcz06)", ignore_case = TRUE),
+    negate = TRUE
+  )) {
     stop("`method` must be either 'tcz06' or 'ff97'")
   }
 
