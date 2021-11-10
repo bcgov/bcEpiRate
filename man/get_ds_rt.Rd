@@ -43,7 +43,7 @@ values of \code{NA} or \code{0} from the calculation of the directly standardize
 \item \code{"zero"} sets specific rates evaluated to \code{NA} as 0. In addition, when
 \code{std_popn} contains 0, the respective stratum is excluded from the
 calculation of the directly standardized rate. However, when \code{std_popn}
-contains \code{NA}, the directly standardized rate is evaluated to \code{NA}. When
+contains \code{NA}, the directly standardized rate evaluates to \code{NA}. When
 \code{output_type = "counts"}, the expected counts are calculated \emph{after}
 specific rates of \code{NA} have been set to 0. \emph{Confidence intervals cannot be
 constructed when this argument is used.}

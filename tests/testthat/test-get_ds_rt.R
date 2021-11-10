@@ -68,11 +68,11 @@ test_that("error is thrown when `scale` is not a scalar", {
 test_that("error is thrown when `scale` is not a positive integer", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = 0),
-    "`scale` must be a positive whole number"
+    "`scale` must be a positive integer"
   )
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = 9999.99),
-    "`scale` must be a positive whole number"
+    "`scale` must be a positive integer"
   )
 })
 
@@ -86,11 +86,11 @@ test_that("error is thrown when `power` is not a scalar", {
 test_that("error is thrown when `power` is not a non-negative integer", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, power = -1),
-    "`power` must be a non-negative whole number"
+    "`power` must be a non-negative integer"
   )
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, power = -3.5),
-    "`power` must be a non-negative whole number"
+    "`power` must be a non-negative integer"
   )
 })
 
@@ -332,7 +332,7 @@ test_that("function throws an error when `dist` is supplied, but not `interval`,
 test_that("function throws an error when user provides unsupported distribution name", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, dist = "poisson", interval = 0.95),
-    "`dist` should be one of 'normal', 'log normal', or 'gamma'"
+    "for a directly standardized rate, `dist` should be one of 'normal', 'log normal', or 'gamma'"
   )
 })
 

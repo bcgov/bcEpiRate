@@ -77,18 +77,18 @@ test_that("function throws an error when `scale` isn't a single number", {
   )
 })
 
-test_that("function throws an error when `scale` isn't a positive whole number", {
+test_that("function throws an error when `scale` isn't a positive integer", {
   expect_error(
     get_spec_rt(counts, popn, scale = 0),
-    "`scale` must be a positive whole number"
+    "`scale` must be a positive integer"
   )
   expect_error(
     get_spec_rt(counts, popn, scale = -1),
-    "`scale` must be a positive whole number"
+    "`scale` must be a positive integer"
   )
   expect_error(
     get_spec_rt(counts, popn, scale = 0.1),
-    "`scale` must be a positive whole number"
+    "`scale` must be a positive integer"
   )
 })
 
@@ -99,14 +99,14 @@ test_that("function throws an error when `power` isn't a single number", {
   )
 })
 
-test_that("function throws an error when `power` isn't a non-negative whole number", {
+test_that("function throws an error when `power` isn't a non-negative integer", {
   expect_error(
     get_spec_rt(counts, popn, power = -1),
-    "`power` must be a non-negative whole number"
+    "`power` must be a non-negative integer"
   )
   expect_error(
     get_spec_rt(counts, popn, power = 0.1),
-    "`power` must be a non-negative whole number"
+    "`power` must be a non-negative integer"
   )
 })
 

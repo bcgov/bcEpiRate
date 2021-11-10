@@ -25,7 +25,7 @@
 #'  * `"zero"` sets specific rates evaluated to `NA` as 0. In addition, when
 #'  `std_popn` contains 0, the respective stratum is excluded from the
 #'  calculation of the directly standardized rate. However, when `std_popn`
-#'  contains `NA`, the directly standardized rate is evaluated to `NA`. When
+#'  contains `NA`, the directly standardized rate evaluates to `NA`. When
 #'  `output_type = "counts"`, the expected counts are calculated *after*
 #'  specific rates of `NA` have been set to 0. *Confidence intervals cannot be
 #'  constructed when this argument is used.*
@@ -134,7 +134,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     }
 
     if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
-      stop("`scale` must be a positive whole number")
+      stop("`scale` must be a positive integer")
     }
 
     multiplier <- scale
@@ -144,7 +144,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     }
 
     if (power %% 1 != 0 | power < 0 | is.na(power)) {
-      stop("`power` must be a non-negative whole number")
+      stop("`power` must be a non-negative integer")
     }
 
     multiplier <- 10**power
@@ -268,7 +268,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
           variance = var, method = method
         ))
     } else {
-      stop("`dist` should be one of 'normal', 'log normal', or 'gamma'")
+      stop("for a directly standardized rate, `dist` should be one of 'normal', 'log normal', or 'gamma'")
     }
 
     # clean output

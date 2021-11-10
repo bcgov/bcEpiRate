@@ -57,7 +57,7 @@ df_norm_02 <- data.frame(
   upper = 20 + qnorm(p = 1 - (0.05 / 2), mean = 0, sd = 1) * sqrt(9)
 )
 
-test_that("function can calculate multiple confidence intervals using the normal distribution", {
+test_that("function can calculate confidence intervals for multiple estimates using normal distribution", {
   expect_equal(
     get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9)),
     rbind(df_norm, df_norm_02)
@@ -134,7 +134,7 @@ df_lnorm_02 <- data.frame(
     exp()
 )
 
-test_that("function can calculate multiple log normal confidence intervals", {
+test_that("function can calculate confidence intervals for multiple estimates using log normal distribution", {
   expect_equal(
     get_ci_lnorm(interval = 0.95, estimate = c(0.4, 0.25), variance_log = c(0.025, 0.04)),
     rbind(df_lnorm, df_lnorm_02)
@@ -220,7 +220,7 @@ df_pois_02 <- data.frame(
   upper = (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (50 + 1))) / (2 * 47516)
 )
 
-test_that("function can calculate multiple Poisson confidence intervals", {
+test_that("function can calculate confidence intervals for multiple estimates using Poisson distribution", {
   expect_equal(
     get_ci_pois(interval = 0.95, x = c(97, 50), y = c(39570, 47516)),
     rbind(df_pois, df_pois_02)
@@ -322,7 +322,7 @@ upper_df_02 <- (2 * (0.004 + w_m_02)**2) / (1e-08 + w_2m_02)
 upper_02 <- upper_coef_02 * stats::qchisq(p = 1 - (0.1 / 2), df = upper_df_02)
 df_gamma_02 <- data.frame(lower = lower_02, upper = upper_02)
 
-test_that("function can calculate multiple confidence intervals", {
+test_that("function can calculate confidence intervals for multiple estimates using gamma", {
   expect_equal(get_ci_gamma(interval = 0.9, estimate = c(0.015, 0.004),
                             weights = list(w, w_02), variance = c(1e-06, 1e-08)),
                rbind(df_gamma, df_gamma_02))

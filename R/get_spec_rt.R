@@ -111,7 +111,7 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     }
 
     if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
-      stop("`scale` must be a positive whole number")
+      stop("`scale` must be a positive integer")
     }
 
     multiplier <- scale
@@ -121,7 +121,7 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
     }
 
     if (power %% 1 != 0 | power < 0 | is.na(power)) {
-      stop("`power` must be a non-negative whole number")
+      stop("`power` must be a non-negative integer")
     }
 
     multiplier <- 10**power
