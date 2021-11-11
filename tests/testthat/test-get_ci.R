@@ -199,7 +199,7 @@ test_that("function throws an error when length of `x` and `y` are incompatbile"
   )
   expect_error(
     get_ci_pois(interval = 0.9, x = c(97, 25, 50), y = 5),
-    "expected `y = 1` given length of `x` and `y`"
+    "length of `y` is not compatible with that of `x`"
   )
 })
 

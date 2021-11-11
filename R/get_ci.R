@@ -202,7 +202,7 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #' stratum-specific number of events or the observed number of events in the
 #' study population.
 #' @param y A vector of positive values. It can contain the population-time for
-#' each stratum or the expected number of events. The default value is `1`.
+#' each stratum or the expected number of events. The default value is `NULL`.
 #'
 #' @details When working with rates, pass the stratum-specific
 #' number of events into `x` and the population-time for each stratum into `y`.
@@ -212,8 +212,7 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #' length.
 #'
 #' To calculate a confidence interval around count data, pass a vector
-#' of counts into `x` and set `y = 1`. The shorter vector `y` will
-#' be repeated so that its length matches that of `x`.
+#' of counts into `x`.
 #'
 #' This function is used to construct confidence intervals in [get_spec_rt()].
 #'
@@ -242,7 +241,7 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
-get_ci_pois <- function(interval, x, y = 1) {
+get_ci_pois <- function(interval, x, y = NULL) {
   # TODO integrate Poisson CI into function that calculates SMR
 
   # check validity of inputs
@@ -271,22 +270,20 @@ get_ci_pois <- function(interval, x, y = 1) {
     stop("`x` must be a vector of positive values")
   }
 
-  if (!is.numeric(y)) {
-    stop("`y` must be numeric")
-  }
-
-  if (!all(y > 0, na.rm = TRUE)) {
-    stop("`y` must be a vector of positive values")
-  }
-
-  if (length(x) != length(y)) {
-    if (length(y) == 1) {
-      if (y != 1) {
-        stop("expected `y = 1` given length of `x` and `y`") # avoid recycling values other than 1
-      }
-    } else {
+  if (!is.null(y)) {
+    if (!is.numeric(y)) {
+      stop("`y` must be a numeric vector of positive integers")
+    }
+    if (!all(y > 0, na.rm = TRUE)) {
+      stop("`y` must be a numeric vector of positive integers")
+    }
+    if (length(x) != length(y)) {
       stop("length of `y` is not compatible with that of `x`")
     }
+
+  } else {
+    # `x` is count data so recycle `y` to match length of `x`
+    y <- 1
   }
 
   # determine quantiles of interest

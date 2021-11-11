@@ -4,7 +4,7 @@
 \alias{get_ci_pois}
 \title{Calculate a Poisson distribution confidence interval}
 \usage{
-get_ci_pois(interval, x, y = 1)
+get_ci_pois(interval, x, y = NULL)
 }
 \arguments{
 \item{interval}{A scalar between 0 and 1, indicating the width of the
@@ -15,7 +15,7 @@ stratum-specific number of events or the observed number of events in the
 study population.}
 
 \item{y}{A vector of positive values. It can contain the population-time for
-each stratum or the expected number of events. The default value is \code{1}.}
+each stratum or the expected number of events. The default value is \code{NULL}.}
 }
 \value{
 A data frame with columns \code{lower} and \code{upper} which contain the lower
@@ -35,8 +35,7 @@ that the values of \code{x} and \code{y} are aligned and that the vectors are th
 length.
 
 To calculate a confidence interval around count data, pass a vector
-of counts into \code{x} and set \code{y = 1}. The shorter vector \code{y} will
-be repeated so that its length matches that of \code{x}.
+of counts into \code{x}.
 
 This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }

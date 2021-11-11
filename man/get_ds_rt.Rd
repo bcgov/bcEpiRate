@@ -61,7 +61,8 @@ confidence interval. For example, for a 95\% confidence interval, use
 distribution. Use \code{"tcz06"} (default) for the method proposed by Tiwari,
 Clegg, and Zou (2006) and \code{"ff97"} for the more conservative method proposed
 by Fay and Feuer (1997). This parameter must be left empty when calculating
-confidence intervals using other distributions.}
+confidence intervals using other distributions. See \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details14.htm#statug_stdrate002267}{SAS Help Center: Direct Standardization}
+for more details.}
 }
 \value{
 If \code{output_type = "rate"} (default) and neither \code{dist} nor \code{interval} is
