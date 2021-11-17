@@ -12,7 +12,8 @@ interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 
 \item{estimate}{A numeric vector containing the point estimates.}
 
-\item{weights}{A list of numeric vectors containing the weights.}
+\item{weights}{A list of numeric vectors where each vector contains the
+weights of each strata in the directly standardized rate calculation.}
 
 \item{variance}{A numeric vector containing the variances.}
 

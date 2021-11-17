@@ -180,15 +180,15 @@ test_that("function throws an error when `x` is invalid", {
 test_that("function throws an error when `x` or `y` is invalid", {
   expect_error(
     get_ci_pois(interval = 0.95, x = 97, y = "hello"),
-    "`y` must be numeric"
+    "`y` must be a numeric vector of positive integers"
   )
   expect_error(
     get_ci_pois(interval = 0.95, x = c(78, 12, 3), y = c(0, 13649, 19479)),
-    "`y` must be a vector of positive values"
+    "`y` must be a numeric vector of positive integers"
   )
   expect_error(
     get_ci_pois(interval = 0.95, x = c(78, 12, 3), y = c(-18864, 13649, 19479)),
-    "`y` must be a vector of positive values"
+    "`y` must be a numeric vector of positive integers"
   )
 })
 

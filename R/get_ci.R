@@ -310,7 +310,8 @@ get_ci_pois <- function(interval, x, y = NULL) {
 #' @param interval A scalar between 0 and 1, indicating the width of the
 #' interval. For example, use `0.95` to calculate a 95% confidence interval.
 #' @param estimate A numeric vector containing the point estimates.
-#' @param weights A list of numeric vectors containing the weights.
+#' @param weights A list of numeric vectors where each vector contains the
+#' weights of each strata in the directly standardized rate calculation.
 #' @param variance A numeric vector containing the variances.
 #' @param method A string to indicate which method to use to calculate the
 #' confidence interval. The default is `"tcz06"` which refers to the method
