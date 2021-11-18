@@ -131,21 +131,21 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
   # set multiplier
   if (!is.null(scale)) { # if only `scale` is supplied
     if (length(scale) != 1) {
-      stop("`scale` must be a single number")
+      stop("`scale` must be a positive integer of length 1")
     }
 
-    if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
-      stop("`scale` must be a positive integer")
+    if (scale %% 1 != 0 | scale < 1) {
+      stop("`scale` must be a positive integer of length 1")
     }
 
     multiplier <- scale
   } else if (!is.null(power)) { # if only `power` is supplied
     if (length(power) != 1) {
-      stop("`power` must be a single number")
+      stop("`power` must be a non-negative integer of length 1")
     }
 
-    if (power %% 1 != 0 | power < 0 | is.na(power)) {
-      stop("`power` must be a non-negative integer")
+    if (power %% 1 != 0 | power < 0) {
+      stop("`power` must be a non-negative integer of length 1")
     }
 
     multiplier <- 10**power

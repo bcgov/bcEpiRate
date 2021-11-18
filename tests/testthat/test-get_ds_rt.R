@@ -58,39 +58,33 @@ test_that("error is thrown when both `scale` and `power` are provided", {
   )
 })
 
-test_that("error is thrown when `scale` is not a scalar", {
+test_that("error is thrown when `scale` is invalid", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = c(1000, 100000)),
-    "`scale` must be a single number"
+    "`scale` must be a positive integer of length 1"
   )
-})
-
-test_that("error is thrown when `scale` is not a positive integer", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = 0),
-    "`scale` must be a positive integer"
+    "`scale` must be a positive integer of length 1"
   )
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = 9999.99),
-    "`scale` must be a positive integer"
+    "`scale` must be a positive integer of length 1"
   )
 })
 
-test_that("error is thrown when `power` is not a scalar", {
+test_that("error is thrown when `power` is invalid", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, power = c(3, 5)),
-    "`power` must be a single number"
+    "`power` must be a non-negative integer of length 1"
   )
-})
-
-test_that("error is thrown when `power` is not a non-negative integer", {
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, power = -1),
-    "`power` must be a non-negative integer"
+    "`power` must be a non-negative integer of length 1"
   )
   expect_error(
-    get_ds_rt(counts_a, popn_a, std_popn_a, power = -3.5),
-    "`power` must be a non-negative integer"
+    get_ds_rt(counts_a, popn_a, std_popn_a, power = 3.5),
+    "`power` must be a non-negative integer of length 1"
   )
 })
 
@@ -416,7 +410,8 @@ test_that("function can calculate log normal confidence intervals", {
 
   df_lnorm <- data.frame(dsr = dsr) %>%
     dplyr::mutate(get_ci_lnorm(0.95, estimate = dsr, variance = var_log),
-                 interval = 0.95)
+      interval = 0.95
+    )
 
   # single confidence interval
   expect_equal(
@@ -428,18 +423,23 @@ test_that("function can calculate log normal confidence intervals", {
   var_log_02 <- (1 / (dsr_02**2)) * var_02
   df_lnorm_02 <- data.frame(dsr = dsr_02) %>%
     dplyr::mutate(get_ci_lnorm(0.95, estimate = dsr_02, variance = var_log_02),
-                  interval = 0.95)
+      interval = 0.95
+    )
 
   # multiple confidence intervals
-  expect_equal(df_comb %>%
-                 dplyr::group_by(grp) %>%
-                 dplyr::summarise(get_ds_rt(counts, popn, std_popn,
-                                            dist = "lognormal", interval = 0.95),
-                                  .groups = "drop"),
-               rbind(df_lnorm, df_lnorm_02) %>%
-                 dplyr::mutate(grp = c("a", "e")) %>%
-                 dplyr::relocate(grp) %>%
-                 tibble::as_tibble())
+  expect_equal(
+    df_comb %>%
+      dplyr::group_by(grp) %>%
+      dplyr::summarise(get_ds_rt(counts, popn, std_popn,
+        dist = "lognormal", interval = 0.95
+      ),
+      .groups = "drop"
+      ),
+    rbind(df_lnorm, df_lnorm_02) %>%
+      dplyr::mutate(grp = c("a", "e")) %>%
+      dplyr::relocate(grp) %>%
+      tibble::as_tibble()
+  )
 })
 
 # define `weights` for testing calculation of gamma confidence intervals
@@ -447,64 +447,88 @@ w <- df %>%
   dplyr::mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn)) %>%
   dplyr::pull(w_j)
 
-w_02<- df_02 %>%
+w_02 <- df_02 %>%
   dplyr::mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn)) %>%
   dplyr::pull(w_j)
 
 test_that("function can calculate gamma confidence intervals (Fey and Feuer)", {
   df_gamma <- data.frame(dsr = dsr) %>%
-    dplyr::mutate(get_ci_gamma(0.9, estimate = dsr,
-                               weights = list(w), variance = var, method = "ff97"),
-                  interval = 0.9)
+    dplyr::mutate(get_ci_gamma(0.9,
+      estimate = dsr,
+      weights = list(w), variance = var, method = "ff97"
+    ),
+    interval = 0.9
+    )
 
   # single confidence interval
-  expect_equal(get_ds_rt(counts_a, popn_a, std_popn_a, dist = "gamma", interval = 0.9, method = "ff97"),
-               df_gamma)
+  expect_equal(
+    get_ds_rt(counts_a, popn_a, std_popn_a, dist = "gamma", interval = 0.9, method = "ff97"),
+    df_gamma
+  )
 
   # perform standardization again
   df_gamma_02 <- data.frame(dsr = dsr_02) %>%
-    dplyr::mutate(get_ci_gamma(0.9, estimate = dsr_02,
-                               weights = list(w_02), variance = var_02, method = "ff97"),
-                  interval = 0.9)
+    dplyr::mutate(get_ci_gamma(0.9,
+      estimate = dsr_02,
+      weights = list(w_02), variance = var_02, method = "ff97"
+    ),
+    interval = 0.9
+    )
 
   # multiple confidence intervals
-  expect_equal(df_comb %>%
-                 dplyr::group_by(grp) %>%
-                 dplyr::summarise(get_ds_rt(counts, popn, std_popn,
-                                            dist = "gamma", interval = 0.9, method = "ff97"),
-                                  .groups = "drop"),
-               rbind(df_gamma, df_gamma_02) %>%
-                 dplyr::mutate(grp = c("a", "e")) %>%
-                 dplyr::relocate(grp) %>%
-                 tibble::as_tibble())
+  expect_equal(
+    df_comb %>%
+      dplyr::group_by(grp) %>%
+      dplyr::summarise(get_ds_rt(counts, popn, std_popn,
+        dist = "gamma", interval = 0.9, method = "ff97"
+      ),
+      .groups = "drop"
+      ),
+    rbind(df_gamma, df_gamma_02) %>%
+      dplyr::mutate(grp = c("a", "e")) %>%
+      dplyr::relocate(grp) %>%
+      tibble::as_tibble()
+  )
 })
 
 test_that("function can calculate gamma confidence intervals (Tiwari, Clegg, and Zou)", {
   df_gamma <- data.frame(dsr = dsr) %>%
-    dplyr::mutate(get_ci_gamma(0.95, estimate = dsr,
-                               weights = list(w), variance = var), # default `method` is 'tcz06'
-                  interval = 0.95)
+    dplyr::mutate(get_ci_gamma(0.95,
+      estimate = dsr,
+      weights = list(w), variance = var
+    ), # default `method` is 'tcz06'
+    interval = 0.95
+    )
 
   # single confidence interval
-  expect_equal(get_ds_rt(counts_a, popn_a, std_popn_a, dist = "gamma", interval = 0.95),
-               df_gamma)
+  expect_equal(
+    get_ds_rt(counts_a, popn_a, std_popn_a, dist = "gamma", interval = 0.95),
+    df_gamma
+  )
 
   # perform standardization again
   df_gamma_02 <- data.frame(dsr = dsr_02) %>%
-    dplyr::mutate(get_ci_gamma(0.95, estimate = dsr_02,
-                               weights = list(w_02), variance = var_02),
-                  interval = 0.95)
+    dplyr::mutate(get_ci_gamma(0.95,
+      estimate = dsr_02,
+      weights = list(w_02), variance = var_02
+    ),
+    interval = 0.95
+    )
 
   # multiple confidence intervals
-  expect_equal(df_comb %>%
-                 dplyr::group_by(grp) %>%
-                 dplyr::summarise(get_ds_rt(counts, popn, std_popn,
-                                            dist = "gamma", interval = 0.95),
-                                  .groups = "drop"),
-               rbind(df_gamma, df_gamma_02) %>%
-                 dplyr::mutate(grp = c("a", "e")) %>%
-                 dplyr::relocate(grp) %>%
-                 tibble::as_tibble())
+  expect_equal(
+    df_comb %>%
+      dplyr::group_by(grp) %>%
+      dplyr::summarise(get_ds_rt(counts, popn, std_popn,
+        dist = "gamma", interval = 0.95
+      ),
+      .groups = "drop"
+      ),
+    rbind(df_gamma, df_gamma_02) %>%
+      dplyr::mutate(grp = c("a", "e")) %>%
+      dplyr::relocate(grp) %>%
+      tibble::as_tibble()
+  )
 })
 
 test_that("type and shape of output data are expected based on input parameters", {

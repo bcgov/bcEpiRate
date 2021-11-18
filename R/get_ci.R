@@ -48,15 +48,15 @@ get_ci_norm <- function(interval, estimate, variance) {
   # check validity of inputs
 
   if (!is.numeric(interval)) {
-    stop("`interval` must be numeric")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (length(interval) != 1) {
-    stop("`interval` must be a scalar")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (interval < 0 | 1 < interval) {
-    stop("`interval` must be between 0 and 1")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (!is.numeric(estimate)) {
@@ -64,11 +64,11 @@ get_ci_norm <- function(interval, estimate, variance) {
   }
 
   if (!is.numeric(variance)) {
-    stop("`variance` must be numeric")
+    stop("`variance` must be numeric and greater than or equal to 0")
   }
 
   if (!all(variance >= 0, na.rm = TRUE)) {
-    stop("`variance` must be greater than or equal to 0")
+    stop("`variance` must be numeric and greater than or equal to 0")
   }
 
   if (length(estimate) != length(variance)) {
@@ -152,15 +152,15 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
   # check validity of inputs
 
   if (!is.numeric(interval)) {
-    stop("`interval` must be numeric")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (length(interval) != 1) {
-    stop("`interval` must be a scalar")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (interval < 0 | 1 < interval) {
-    stop("`interval` must be between 0 and 1")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (!is.numeric(estimate)) {

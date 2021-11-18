@@ -3,15 +3,15 @@
 test_that("function throws an error when `interval` is invalid", {
   expect_error(
     get_ci_norm(interval = "hello", estimate = 10, variance = 4),
-    "`interval` must be numeric"
+    "`interval` must be a scalar between 0 and 1"
   )
   expect_error(
     get_ci_norm(interval = c(0.95, 0.975), estimate = 10, variance = 4),
-    "`interval` must be a scalar"
+    "`interval` must be a scalar between 0 and 1"
   )
   expect_error(
     get_ci_norm(interval = -1, estimate = 10, variance = 4),
-    "`interval` must be between 0 and 1"
+    "`interval` must be a scalar between 0 and 1"
   )
 })
 
@@ -25,11 +25,11 @@ test_that("function throws an error when `estimate` is invalid", {
 test_that("function throws an error `variance` is invalid", {
   expect_error(
     get_ci_norm(interval = 0.9, estimate = 10, variance = "hello"),
-    "`variance` must be numeric"
+    "`variance` must be numeric and greater than or equal to 0"
   )
   expect_error(
     get_ci_norm(interval = 0.9, estimate = 10, variance = -1),
-    "`variance` must be greater than or equal to 0"
+    "`variance` must be numeric and greater than or equal to 0"
   )
 })
 
@@ -80,15 +80,15 @@ test_that("function throws a warning if the normal distribution should be avoide
 test_that("function throws an error when `interval` is invalid", {
   expect_error(
     get_ci_lnorm(interval = "hello", estimate = 0.2, variance_log = 0.05),
-    "`interval` must be numeric"
+    "`interval` must be a scalar between 0 and 1"
   )
   expect_error(
     get_ci_lnorm(interval = c(0.9, 0.95), estimate = 0.2, variance_log = 0.05),
-    "`interval` must be a scalar"
+    "`interval` must be a scalar between 0 and 1"
   )
   expect_error(
     get_ci_lnorm(interval = -1, estimate = 0.2, variance_log = 0.05),
-    "`interval` must be between 0 and 1"
+    "`interval` must be a scalar between 0 and 1"
   )
 })
 
