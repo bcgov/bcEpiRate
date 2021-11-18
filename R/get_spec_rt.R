@@ -85,15 +85,15 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
 
   # check for valid inputs
   if (!is.numeric(counts)) {
-    stop("`counts` must be a numeric vector")
+    stop("`counts` must be a numeric vector of non-negative integers")
   } else if (any(counts < 0, na.rm = TRUE)) {
-    stop("`counts` should contain non-negative elements")
+    stop("`counts` must be a numeric vector of non-negative integers")
   }
 
   if (!is.numeric(popn)) {
-    stop("`popn` must be a numeric vector")
+    stop("`popn` must be a numeric vector of non-negative integers")
   } else if (any(popn < 0, na.rm = TRUE)) {
-    stop("`popn` should contain non-negative elements")
+    stop("`popn` must be a numeric vector of non-negative integers")
   }
 
   if (length(counts) != length(popn)) {
@@ -107,21 +107,21 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
   # set multiplier
   if (!is.null(scale)) { # if only `scale` is supplied
     if (length(scale) != 1) {
-      stop("`scale` must be a single number")
+      stop("`scale` must be a positive integer of length 1")
     }
 
-    if (scale %% 1 != 0 | scale < 1 | is.na(scale)) {
-      stop("`scale` must be a positive integer")
+    if (scale %% 1 != 0 | scale < 1) {
+      stop("`scale` must be a positive integer of length 1")
     }
 
     multiplier <- scale
   } else if (!is.null(power)) { # if only `power` is supplied
     if (length(power) != 1) {
-      stop("`power` must be a single number")
+      stop("`power` must be a non-negative integer of length 1")
     }
 
-    if (power %% 1 != 0 | power < 0 | is.na(power)) {
-      stop("`power` must be a non-negative integer")
+    if (power %% 1 != 0 | power < 0) {
+      stop("`power` must be a non-negative integer of length 1")
     }
 
     multiplier <- 10**power

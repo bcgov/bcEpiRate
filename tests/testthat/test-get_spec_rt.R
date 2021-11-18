@@ -25,34 +25,28 @@ test_that("function works with dplyr::mutate()", {
   expect_equal(df$spec_rate, c(10000, 4000, 3000, 800, 500))
 })
 
-test_that("function throws an error when either vector isn't numeric", {
-  char_vec <- c("apple", "banana", "carrot", "dragonfruit", "eggplant")
+# define a problematic vector
+char_vec <- c("apple", "banana", "carrot", "dragonfruit", "eggplant")
 
-  expect_error(get_spec_rt(char_vec, popn), "`counts` must be a numeric vector")
-  expect_error(get_spec_rt(counts, char_vec), "`popn` must be a numeric vector")
+test_that("function throws an error when `counts` isn't valid", {
+  expect_error(
+    get_spec_rt(char_vec, popn),
+    "`counts` must be a numeric vector of non-negative integers"
+  )
+  expect_error(
+    get_spec_rt(c(-1, 2, 3, 4, 5), popn),
+    "`counts` must be a numeric vector of non-negative integers"
+  )
 })
 
-test_that("function throws an error when either vector contains negative elements", {
-  counts_one_neg <- c(-1, 2, 3, 4, 5)
-  counts_all_neg <- c(-1, -2, -3, -4, -5)
-  popn_one_neg <- c(-10, 50, 100, 500, 1000)
-  popn_all_neg <- c(-10, -50, -100, -500, -1000)
-
+test_that("function throws an error when `popn` isn't valid", {
   expect_error(
-    get_spec_rt(counts_one_neg, popn),
-    "`counts` should contain non-negative elements"
+    get_spec_rt(counts, char_vec),
+    "`popn` must be a numeric vector of non-negative integers"
   )
   expect_error(
-    get_spec_rt(counts_all_neg, popn),
-    "`counts` should contain non-negative elements"
-  )
-  expect_error(
-    get_spec_rt(counts, popn_one_neg),
-    "`popn` should contain non-negative elements"
-  )
-  expect_error(
-    get_spec_rt(counts, popn_all_neg),
-    "`popn` should contain non-negative elements"
+    get_spec_rt(counts, c(-10, 50, 100, 500, 1000)),
+    "`popn` must be a numeric vector of non-negative integers"
   )
 })
 
@@ -70,43 +64,37 @@ test_that("function throws an error when both `scale` and `power` are supplied",
   )
 })
 
-test_that("function throws an error when `scale` isn't a single number", {
+test_that("function throws an error when `scale` isn't valid", {
   expect_error(
     get_spec_rt(counts, popn, scale = c(1, 1000)),
-    "`scale` must be a single number"
+    "`scale` must be a positive integer of length 1"
   )
-})
-
-test_that("function throws an error when `scale` isn't a positive integer", {
   expect_error(
     get_spec_rt(counts, popn, scale = 0),
-    "`scale` must be a positive integer"
+    "`scale` must be a positive integer of length 1"
   )
   expect_error(
     get_spec_rt(counts, popn, scale = -1),
-    "`scale` must be a positive integer"
+    "`scale` must be a positive integer of length 1"
   )
   expect_error(
     get_spec_rt(counts, popn, scale = 0.1),
-    "`scale` must be a positive integer"
+    "`scale` must be a positive integer of length 1"
   )
 })
 
-test_that("function throws an error when `power` isn't a single number", {
+test_that("function throws an error when `power` isn't valid", {
   expect_error(
     get_spec_rt(counts, popn, power = c(1, 2, 3)),
-    "`power` must be a single number"
+    "`power` must be a non-negative integer of length 1"
   )
-})
-
-test_that("function throws an error when `power` isn't a non-negative integer", {
   expect_error(
     get_spec_rt(counts, popn, power = -1),
-    "`power` must be a non-negative integer"
+    "`power` must be a non-negative integer of length 1"
   )
   expect_error(
     get_spec_rt(counts, popn, power = 0.1),
-    "`power` must be a non-negative integer"
+    "`power` must be a non-negative integer of length 1"
   )
 })
 
@@ -251,12 +239,16 @@ test_that("limits are NA when specific rates evaluate to NA", {
 })
 
 test_that("multipliers are applied correctly", {
-  expect_equal(get_spec_rt(counts, popn, power = 3, dist = "lognormal", interval = 0.95),
-               get_spec_rt(counts, popn, dist = "lognormal", interval = 0.95) %>%
-                 dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 1000)))
-  expect_equal(get_spec_rt(counts, popn, scale = 100000, dist = "poisson", interval = 0.9),
-               get_spec_rt(counts, popn, dist = "poisson", interval = 0.9) %>%
-                 dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 100000)))
+  expect_equal(
+    get_spec_rt(counts, popn, power = 3, dist = "lognormal", interval = 0.95),
+    get_spec_rt(counts, popn, dist = "lognormal", interval = 0.95) %>%
+      dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 1000))
+  )
+  expect_equal(
+    get_spec_rt(counts, popn, scale = 100000, dist = "poisson", interval = 0.9),
+    get_spec_rt(counts, popn, dist = "poisson", interval = 0.9) %>%
+      dplyr::mutate(dplyr::across(-interval, .fns = ~ .x * 100000))
+  )
 })
 
 test_that("type and shape of output data are as expected based on input", {
