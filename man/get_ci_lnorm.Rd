@@ -20,7 +20,7 @@ A data frame with columns \code{lower} and \code{upper} which contain the lower
 and upper limits of a confidence interval respectively.
 }
 \description{
-Calculate a log normal distribution confidence interval
+Calculate a log normal distribution confidence interval.
 }
 \details{
 This function doesn't need to know which type of epidemiological
@@ -36,7 +36,7 @@ This function is used to construct confidence intervals in \code{\link[=get_spec
 # calculate a single confidence interval
 get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = 0.05)
 
-# calculate multiple confidence interval
+# calculate confidence intervals around multiple estimates
 get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
 
 # use columns of a data frame as inputs
@@ -53,4 +53,7 @@ get_ci_lnorm(interval = 0.975, estimate = df$estimate, variance_log = df$varianc
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}, \code{\link[=get_ci_gamma]{get_ci_gamma()}}
 }

@@ -53,8 +53,8 @@
 #' @examples
 #' \dontrun{
 #' # using vectors
-#' counts <- c(1, 2, 3, 4, 5)
-#' popn <- c(10, 50, 100, 500, 1000)
+#' counts <- c(100, 200, 300, 400, 500)
+#' popn <- c(1000, 5000, 10000, 50000, 100000)
 #'
 #' get_spec_rt(counts, popn)
 #' get_spec_rt(counts, popn, scale = 1000)

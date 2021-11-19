@@ -50,7 +50,7 @@ v_1 <- 1e-06
 get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
 get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
 
-# calculate multiple confidence intervals
+# calculate confidence intervals around multiple estimates
 e_2 <- 0.004
 w_2 <- c(
   3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
@@ -67,4 +67,7 @@ get_ci_gamma(
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}
 }

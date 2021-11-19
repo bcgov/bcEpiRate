@@ -25,7 +25,7 @@
 #' # calculate a single confidence interval
 #' get_ci_norm(interval = 0.95, estimate = 10, variance = 4)
 #'
-#' # calculate multiple confidence intervals
+#' # calculate confidence intervals around multiple estimates
 #' get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9))
 #'
 #' # use columns of a data frame as inputs
@@ -41,6 +41,7 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_lnorm()], [get_ci_pois()], [get_ci_gamma()]
 #' @export
 get_ci_norm <- function(interval, estimate, variance) {
   # TODO integrate normal CI into functions that calculate risk, standardized risk, SMR, rate difference, and risk difference
@@ -104,7 +105,7 @@ get_ci_norm <- function(interval, estimate, variance) {
 
 #' Calculate a log normal distribution confidence interval
 #'
-#' @description Calculate a log normal distribution confidence interval
+#' @description Calculate a log normal distribution confidence interval.
 #'
 #' @param interval A scalar between 0 and 1, indicating the width of the
 #' interval. For example, use `0.95` to calculate a 95% confidence interval.
@@ -130,7 +131,7 @@ get_ci_norm <- function(interval, estimate, variance) {
 #' # calculate a single confidence interval
 #' get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = 0.05)
 #'
-#' # calculate multiple confidence interval
+#' # calculate confidence intervals around multiple estimates
 #' get_ci_lnorm(interval = 0.95, estimate = c(0.2, 0.4), variance_log = c(0.05, 0.025))
 #'
 #' # use columns of a data frame as inputs
@@ -146,6 +147,7 @@ get_ci_norm <- function(interval, estimate, variance) {
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_pois()], [get_ci_gamma()]
 #' @export
 get_ci_lnorm <- function(interval, estimate, variance_log) {
   # TODO integrate log normal CI into functions that calculate risk, standardized risk, SMR, rate ratio, and risk ratio
@@ -240,6 +242,7 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_gamma()]
 #' @export
 get_ci_pois <- function(interval, x, y = NULL) {
   # TODO integrate Poisson CI into function that calculates SMR
@@ -247,40 +250,39 @@ get_ci_pois <- function(interval, x, y = NULL) {
   # check validity of inputs
 
   if (!is.numeric(interval)) {
-    stop("`interval` must be numeric")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (length(interval) != 1) {
-    stop("`interval` must be a scalar")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (interval < 0 | 1 < interval) {
-    stop("`interval` must be between 0 and 1")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (!is.numeric(x)) {
-    stop("`x` must be numeric")
+    stop("`x` must be a numeric vector of positive integers")
   }
 
   if (!all(x %% 1 == 0, na.rm = TRUE)) {
-    stop("`x` must be a vector of integers")
+    stop("`x` must be a numeric vector of positive integers")
   }
 
   if (!all(x > 0, na.rm = TRUE)) {
-    stop("`x` must be a vector of positive values")
+    stop("`x` must be a numeric vector of positive integers")
   }
 
   if (!is.null(y)) {
     if (!is.numeric(y)) {
-      stop("`y` must be a numeric vector of positive integers")
+      stop("`y` must be a numeric vector of positive numbers")
     }
     if (!all(y > 0, na.rm = TRUE)) {
-      stop("`y` must be a numeric vector of positive integers")
+      stop("`y` must be a numeric vector of positive numbers")
     }
     if (length(x) != length(y)) {
       stop("length of `y` is not compatible with that of `x`")
     }
-
   } else {
     # `x` is count data so recycle `y` to match length of `x`
     y <- 1
@@ -342,7 +344,7 @@ get_ci_pois <- function(interval, x, y = NULL) {
 #' get_ci_gamma(interval = 0.95, estimate = e_1, weights = list(w_1), variance = v_1)
 #' get_ci_gamma(interval = 0.9, estimate = e_1, weights = list(w_1), variance = v_1, method = "ff97")
 #'
-#' # calculate multiple confidence intervals
+#' # calculate confidence intervals around multiple estimates
 #' e_2 <- 0.004
 #' w_2 <- c(
 #'   3.4e-06, 2.0e-06, 1.8e-06, 1.1e-06, 2.1e-06,
@@ -358,20 +360,21 @@ get_ci_pois <- function(interval, x, y = NULL) {
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_pois()]
 #' @export
 get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06") {
   # check validity of inputs
 
   if (!is.numeric(interval)) {
-    stop("`interval` must be numeric")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (length(interval) != 1) {
-    stop("`interval` must be a scalar")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (interval < 0 | 1 < interval) {
-    stop("`interval` must be between 0 and 1")
+    stop("`interval` must be a scalar between 0 and 1")
   }
 
   if (!is.numeric(estimate)) {
@@ -379,7 +382,7 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
   }
 
   if (!is.list(weights)) {
-    stop("`weights` must be a list")
+    stop("`weights` must be a list of numeric vectors")
   }
 
   if (!all(sapply(weights, is.numeric))) {

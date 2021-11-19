@@ -35,7 +35,7 @@ This function is used to construct confidence intervals in \code{\link[=get_spec
 # calculate a single confidence interval
 get_ci_norm(interval = 0.95, estimate = 10, variance = 4)
 
-# calculate multiple confidence intervals
+# calculate confidence intervals around multiple estimates
 get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9))
 
 # use columns of a data frame as inputs
@@ -52,4 +52,7 @@ get_ci_norm(interval = 0.975, estimate = df$estimate, variance = df$variance)
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}, \code{\link[=get_ci_gamma]{get_ci_gamma()}}
 }

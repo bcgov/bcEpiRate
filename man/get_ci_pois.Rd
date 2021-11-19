@@ -60,3 +60,6 @@ get_ci_pois(0.95, df$x, df$y)
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 }
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_gamma]{get_ci_gamma()}}
+}

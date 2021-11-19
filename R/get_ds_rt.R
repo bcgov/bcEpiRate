@@ -35,7 +35,7 @@
 #' @param interval A scalar, between 0 and 1, indicating the width of the
 #' confidence interval. For example, for a 95% confidence interval, use
 #' `interval = 0.95`.
-#' @param method A string specifying the method to use when using gamma
+#' @param method A string specifying the method to use when using the gamma
 #' distribution. Use `"tcz06"` (default) for the method proposed by Tiwari,
 #' Clegg, and Zou (2006) and `"ff97"` for the more conservative method proposed
 #' by Fay and Feuer (1997). This parameter must be left empty when calculating

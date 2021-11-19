@@ -57,7 +57,7 @@ confidence interval to follow. Can be either \code{"normal"}, \code{"log normal"
 confidence interval. For example, for a 95\% confidence interval, use
 \code{interval = 0.95}.}
 
-\item{method}{A string specifying the method to use when using gamma
+\item{method}{A string specifying the method to use when using the gamma
 distribution. Use \code{"tcz06"} (default) for the method proposed by Tiwari,
 Clegg, and Zou (2006) and \code{"ff97"} for the more conservative method proposed
 by Fay and Feuer (1997). This parameter must be left empty when calculating
