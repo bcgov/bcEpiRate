@@ -66,6 +66,10 @@ test_that("function throws an error when both `scale` and `power` are supplied",
 
 test_that("function throws an error when `scale` isn't valid", {
   expect_error(
+    get_spec_rt(counts, popn, scale = "hello"),
+    "`scale` must be a positive integer of length 1"
+  )
+  expect_error(
     get_spec_rt(counts, popn, scale = c(1, 1000)),
     "`scale` must be a positive integer of length 1"
   )
@@ -84,6 +88,10 @@ test_that("function throws an error when `scale` isn't valid", {
 })
 
 test_that("function throws an error when `power` isn't valid", {
+  expect_error(
+    get_spec_rt(counts, popn, power = "hello"),
+    "`power` must be a non-negative integer of length 1"
+  )
   expect_error(
     get_spec_rt(counts, popn, power = c(1, 2, 3)),
     "`power` must be a non-negative integer of length 1"

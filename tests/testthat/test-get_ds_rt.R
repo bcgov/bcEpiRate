@@ -60,6 +60,10 @@ test_that("error is thrown when both `scale` and `power` are provided", {
 
 test_that("error is thrown when `scale` is invalid", {
   expect_error(
+    get_ds_rt(counts_a, popn_a, std_popn_a, scale = "hello"),
+    "`scale` must be a positive integer of length 1"
+  )
+  expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, scale = c(1000, 100000)),
     "`scale` must be a positive integer of length 1"
   )
@@ -74,6 +78,10 @@ test_that("error is thrown when `scale` is invalid", {
 })
 
 test_that("error is thrown when `power` is invalid", {
+  expect_error(
+    get_ds_rt(counts_a, popn_a, std_popn_a, power = "hello"),
+    "`power` must be a non-negative integer of length 1"
+  )
   expect_error(
     get_ds_rt(counts_a, popn_a, std_popn_a, power = c(3, 5)),
     "`power` must be a non-negative integer of length 1"

@@ -106,6 +106,9 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
 
   # set multiplier
   if (!is.null(scale)) { # if only `scale` is supplied
+    if (!is.numeric(scale)) {
+      stop("`scale` must be a positive integer of length 1")
+    }
     if (length(scale) != 1) {
       stop("`scale` must be a positive integer of length 1")
     }
@@ -116,6 +119,10 @@ get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status 
 
     multiplier <- scale
   } else if (!is.null(power)) { # if only `power` is supplied
+    if(!is.numeric(power)) {
+      stop("`power` must be a non-negative integer of length 1")
+    }
+
     if (length(power) != 1) {
       stop("`power` must be a non-negative integer of length 1")
     }
