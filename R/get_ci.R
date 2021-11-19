@@ -170,10 +170,12 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
   }
 
   if (!is.numeric(variance_log)) {
-    stop("`variance_log` must be numeric")
+    stop("`variance_log` must be numeric and greater than or equal to 0")
   }
 
-  # TODO check if variance_log > 0
+  if (!all(variance_log >= 0, na.rm = TRUE)) {
+    stop("`variance_log` must be numeric and greater than or equal to 0")
+  }
 
   if (length(estimate) != length(variance_log)) {
     stop("length of `variance_log` must be equal to length of `estimate`")
@@ -390,7 +392,11 @@ get_ci_gamma <- function(interval, estimate, weights, variance, method = "tcz06"
   }
 
   if (!is.numeric(variance)) {
-    stop("`variance` must be numeric")
+    stop("`variance` must be numeric and greater than or equal to 0")
+  }
+
+  if (!all(variance >= 0, na.rm = TRUE)) {
+    stop("`variance` must be numeric and greater than or equal to 0")
   }
 
   if (stringr::str_detect(method,

@@ -102,7 +102,11 @@ test_that("function throws an error when `estimate` is invalid", {
 test_that("function throws an error when `variance_log` is invalid", {
   expect_error(
     get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = "hello"),
-    "`variance_log` must be numeric"
+    "`variance_log` must be numeric and greater than or equal to 0"
+  )
+  expect_error(
+    get_ci_lnorm(interval = 0.95, estimate = 0.2, variance_log = -1),
+    "`variance_log` must be numeric and greater than or equal to 0"
   )
 })
 
@@ -288,7 +292,11 @@ test_that("function thrown an error when `weights` is invalid", {
 test_that("function throws an error when `variance` is invalid", {
   expect_error(
     get_ci_gamma(interval = 0.9, estimate = 0.015, weights = list(w), variance = "hello"),
-    "`variance` must be numeric"
+    "`variance` must be numeric and greater than or equal to 0"
+  )
+  expect_error(
+    get_ci_gamma(interval = 0.9, estimate = 0.015, weights = list(w), variance = -1),
+    "`variance` must be numeric and greater than or equal to 0"
   )
 })
 
