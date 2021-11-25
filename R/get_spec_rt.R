@@ -15,7 +15,7 @@
 #' the validity of the corresponding elements in the input vectors is returned.
 #' @param dist A string to indicate the type of probability distribution for the
 #' confidence interval to follow. Can be one of the following: `"normal"`,
-#' `"log normal"`, or `"poisson"`. This parameter is case insensitive.
+#' `"log normal"` or `"poisson"`. This parameter is case insensitive.
 #' @param interval A scalar, between 0 and 1, indicating the width of the
 #' confidence interval. For example, for a 95% confidence interval, use
 #' `interval = 0.95`.

@@ -50,7 +50,7 @@ constructed when this argument is used.}
 }}
 
 \item{dist}{A string to indicate the type of probability distribution for the
-confidence interval to follow. Can be either \code{"normal"}, \code{"log normal"}, or
+confidence interval to follow. Can be either \code{"normal"}, \code{"log normal"} or
 \code{"gamma"}. This parameter is case insensitive.}
 
 \item{interval}{A scalar, between 0 and 1, indicating the width of the

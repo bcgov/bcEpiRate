@@ -30,7 +30,7 @@
 #'  specific rates of `NA` have been set to 0. *Confidence intervals cannot be
 #'  constructed when this argument is used.*
 #' @param dist A string to indicate the type of probability distribution for the
-#' confidence interval to follow. Can be either `"normal"`, `"log normal"`, or
+#' confidence interval to follow. Can be either `"normal"`, `"log normal"` or
 #' `"gamma"`. This parameter is case insensitive.
 #' @param interval A scalar, between 0 and 1, indicating the width of the
 #' confidence interval. For example, for a 95% confidence interval, use

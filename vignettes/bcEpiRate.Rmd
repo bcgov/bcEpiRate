@@ -371,30 +371,16 @@ population. Let's say that 278 people died from Disease D in 2016:
 
 ```{r example-06}
 # define number of observed deaths
-count_06 <- 278
+
 
 # filter study population size by year of interest
-popn_06 <- population %>%
-  filter(year == 2016) %>%
-  group_by(age_group) %>% # aggregate population count by age group
-  summarise(popn = sum(popn), .groups = "drop") %>%
-  pull(popn)
 
 # filter age-specific mortality rates by disease of interest
-std_rt_06 <- death_rates %>%
-  filter(disease == "Disease D") %>%
-  pull(std_rt)
+
   
 # calculate SMR
-smr <- get_smr(count = count_06, popn = popn_06, std_rt = std_rt_06)
-smr
+
 ```
-
-The number of deaths in the study is `r round(smr * 100, 1)`% of the
-number of expected deaths.
-
-The ability to construct confidence intervals will be available in the
-future.
 
 ## 🤹 Exception handling
 
