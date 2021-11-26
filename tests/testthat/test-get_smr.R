@@ -79,8 +79,39 @@ test_that("function throws an error when user provides unsupported distribution 
                "`dist` should be one of 'normal', 'lognormal' or 'poisson'")
 })
 
-test_that("function can correctly calculate confidence intervals around estimates", {
+test_that("function can correctly calculate confidence intervals around rate-SMR estimates", {
+  # normal
+  expected <- sum(popn * std_r)
+  smr <- count / expected
+  var <- smr / expected
+  interval <- 0.99
+  df_norm <- get_ci_norm(interval = interval, estimate = smr, var = var) %>%
+    dplyr::mutate(smr = smr, interval = interval) %>%
+    dplyr::select(smr, lower, upper, interval)
 
+  expect_equal(get_smr(count = count, popn = popn, std_r = std_r,
+                       dist = "normal", interval = interval),
+               df_norm)
+
+  # log normal
+  var_log <- 1 / count
+  df_lnorm <- get_ci_lnorm(interval = interval, estimate = smr, variance_log = var_log) %>%
+    dplyr::mutate(smr = smr, interval = interval) %>%
+    dplyr::select(smr, lower, upper, interval)
+
+  expect_equal(get_smr(count = count, popn = popn, std_r = std_r,
+                       dist = "lognormal", interval = interval),
+               df_lnorm)
+
+  # poisson (express SMR as percentage)
+  df_pois <- get_ci_pois(interval = interval, x = count, y = expected) %>%
+    dplyr::mutate(smr = smr, interval = interval,
+                  dplyr::across(-interval, ~ .x * 100)) %>%
+    dplyr::select(smr, lower, upper, interval)
+
+  expect_equal(get_smr(count = count, popn = popn, std_r = std_r, percent = TRUE,
+                       dist = "poisson", interval = interval),
+               df_pois)
 })
 
 # TODO: add more checks once risk SMR is implemented
@@ -104,18 +135,3 @@ test_that("type and shape of output data are expected based on input parameters"
   expect_equal(ncol(out_03), 4)
   expect_true(setequal(c("smr", "lower", "upper", "interval"), colnames(out_03)))
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
