@@ -231,7 +231,17 @@ test_that("function can calculate confidence intervals for multiple estimates us
   )
 })
 
-# TODO add check on count data
+df_pois_03 <- data.frame(
+  lower = (stats::qchisq(p = 0.05 / 2, df = 2 * 97)) / 2,
+  upper = (stats::qchisq(p = 1 - (0.05 / 2), df = 2 * (97 + 1))) / 2
+)
+
+test_that("function can calculate confidence intervals for count data", {
+  expect_equal(
+    get_ci_pois(interval = 0.95, x = 97),
+    df_pois_03
+  )
+})
 
 # Test ability to calculate gamma confidence intervals -----------------------
 
@@ -383,7 +393,7 @@ test_that("function can calculate confidence intervals for multiple estimates us
   )
 })
 
-# Test ability to calculate Poisson confidence intervals -----------------------
+# Test ability to detect probability distribution name -----------------------
 
 test_that("function can detect probability distribution names", {
   expect_equal(
