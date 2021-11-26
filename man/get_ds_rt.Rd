@@ -69,7 +69,7 @@ If \code{output_type = "rate"} (default) and neither \code{dist} nor \code{inter
 supplied, the directly standardized rate is returned as a numeric vector.
 
 If \code{output_type = "rate"} and both \code{dist} and \code{interval} are provided, then a
-data frame is returned with the columns \code{rate}, \code{lower}, \code{upper} and
+data frame is returned with the columns \code{dsr}, \code{lower}, \code{upper} and
 \code{interval}.
 
 If \code{output_type = "counts"}, the expected counts are returned as a numeric

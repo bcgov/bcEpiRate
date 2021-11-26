@@ -1,99 +1,121 @@
-# # define necessary arguments
-# count <- 15300
-# popn <- c(1500000, 550000, 120000)
-# std_rt <- c(0.0012, 0.0036, 0.048)
-#
-# test_that("function works when all arguments are valid", {
-#   expect_equal(get_smr(count, popn, std_rt),
-#     count / sum(popn * std_rt),
-#     tolerance = 1e-6
-#   )
-#   expect_equal(
-#     get_smr(count, popn, std_rt, output_type = "counts"),
-#     popn * std_rt
-#   )
-#   expect_equal(get_smr(count, popn, std_rt, percent = TRUE),
-#     count / sum(popn * std_rt) * 100,
-#     tolerance = 1e-6
-#   )
-# })
-#
-# # define a character vector
-# char_vec <- c("apple", "banana", "carrot")
-#
-# test_that("function throws an error when the input array isn't numeric", {
-#   expect_error(get_smr(count, popn = char_vec, std_rt),
-#     "`popn` must be a numeric vector"
-#   )
-#   expect_error(
-#     get_smr(count, popn, std_rt = char_vec),
-#     "`std_rt` must be a numeric vector"
-#   )
-# })
-#
-# test_that("function throws an error when `count` isn't a numeric scalar", {
-#   expect_error(get_smr("apple", popn, std_rt), "`count` must be numeric")
-#   expect_error(get_smr(char_vec, popn, std_rt), "`count` must be numeric")
-#   expect_error(get_smr(c(15300, 147000), popn, std_rt), "`count` must be a scalar")
-# })
-#
-# test_that("function throws an error when the lengths of input arrays don't match", {
-#   expect_error(
-#     get_smr(count, popn, std_rt[1:2]),
-#     "lengths of `popn` and `std_rt` must match"
-#   )
-# })
-#
-# test_that("function throws an error when `output_type` isn't one of 'ratio' or 'counts'", {
-#   expect_error(
-#     get_smr(count, popn, std_rt, output_type = "rate"),
-#     '`output_type` must be either "ratio" or "counts"'
-#   )
-# })
-#
-# test_that("function throws an error when `percent` isn't logical", {
-#   expect_error(
-#     get_smr(count, popn, std_rt, percent = "rate"),
-#     "`percent` must be one of TRUE or FALSE"
-#   )
-#   expect_error(
-#     get_smr(count, popn, std_rt, percent = NA),
-#     "`percent` must be one of TRUE or FALSE"
-#   )
-# })
-#
-# # define input vectors with NA
-# popn_na <- c(1500000, 550000, NA)
-# std_rt_na <- c(0.0012, 0.0036, NA)
-#
-# test_that("function throws an error when `output_type` is 'ratio' and input vectors have NA values", {
-#   expect_error(
-#     get_smr(count, popn_na, std_rt, output_type = "ratio"),
-#     "when calculating the SMR, `popn` should not have any NA values"
-#   )
-#   expect_error(
-#     get_smr(count, popn, std_rt_na, output_type = "ratio"),
-#     "when calculating the SMR, `std_rt` should not have any NA values"
-#   )
-# })
-#
-# test_that("function raises a warning when `output_type` is 'counts' and input vectors have NA values", {
-#   expect_warning(
-#     get_smr(count, popn_na, std_rt, output_type = "counts"),
-#     "one or more elements in `popn` are NA"
-#   )
-#   expect_equal(
-#     suppressWarnings(get_smr(count, popn_na, std_rt, output_type = "counts")),
-#     popn_na * std_rt,
-#     tolerance = 1e-6
-#   )
-#   expect_warning(
-#     get_smr(count, popn, std_rt_na, output_type = "counts"),
-#     "one or more elements in `std_rt` are NA"
-#   )
-#   expect_equal(
-#     suppressWarnings(get_smr(count, popn, std_rt_na, output_type = "counts")),
-#     popn * std_rt_na,
-#     tolerance = 1e-6
-#   )
-# })
+# define necessary arguments
+count <- 1500
+popn <- c(13358, 13029, 34378, 39649, 11671)
+std_r <- c(0.004, 0.003, 0.007, 0.011, 0.013)
+
+# test input validation ---------------------------
+
+test_that("error thrown when `count` is invalid", {
+  expect_error(get_smr(count = "hello", popn = popn, std_r = std_r),
+               "`count` must be a non-negative integer of length 1")
+  expect_error(get_smr(count = c(1500, 1785), popn = popn, std_r = std_r),
+               "`count` must be a non-negative integer of length 1")
+  expect_error(get_smr(count = -1, popn = popn, std_r = std_r),
+               "`count` must be a non-negative integer of length 1")
+  expect_error(get_smr(count = 0.1, popn = popn, std_r = std_r),
+               "`count` must be a non-negative integer of length 1")
+})
+
+test_that("error thrown when input lengths are incompatible", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r[1:3]),
+               "lengths of `popn` and `std_r` must be the same")
+})
+
+
+test_that("error thrown when `popn` is invalid", {
+  expect_error(get_smr(count = count, popn = rep("hello", 5), std_r = std_r),
+               "`popn` must be a numeric vector of non-negative integers")
+  expect_error(get_smr(count = count, popn = popn * -1, std_r = std_r),
+               "`popn` must be a numeric vector of non-negative integers")
+})
+
+# TODO: have different error messages when risk SMR is implemented
+test_that("error thrown when `std_r` is invalid", {
+  expect_error(get_smr(count = count, popn = popn, std_r = rep("hello", 5)),
+              "`std_r` must be a numeric vector")
+})
+
+# TODO: relax test when risk SMR is implemented
+test_that("error thrown when `measure` is invalid", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, measure = "risk"),
+               "function currently only supports rate-SMR")
+})
+
+test_that("error thrown when `output_type` is invalid", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, output_type = "hello"),
+               "`output_type` must be either 'ratio' or 'counts'")
+})
+
+test_that("error thrown when `percent` is invalid", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, percent = "hello"),
+               "`percent` must be a boolean")
+})
+
+# test rate SMR calculation ---------------------------
+test_that("function can correctly calculate rate SMR", {
+  smr <- count / sum(popn * std_r)
+  expect_equal(smr, get_smr(count = count, popn = popn, std_r = std_r, output_type = "ratio"))
+  expect_equal(smr * 100,
+               get_smr(count = count, popn = popn, std_r = std_r,
+                       output_type = "ratio", percent = TRUE))
+})
+
+# test expected counts calculation ---------------------------
+test_that("function can correctly calculate expected number of events in each stratum", {
+  expect_equal(popn * std_r,
+               get_smr(count = count, popn = popn, std_r = std_r, output_type = "counts"))
+})
+
+# test confidence interval calculation ---------------------------
+test_that("error thrown when `dist` is supplied, but not `interval`, and vice versa", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, dist = "normal"),
+               "both `dist` and `interval` must be supplied to calculate confidence intervals")
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, interval = 0.9),
+               "both `dist` and `interval` must be supplied to calculate confidence intervals")
+})
+
+test_that("function throws an error when user provides unsupported distribution name", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, dist = "gamma", interval = 0.9),
+               "`dist` should be one of 'normal', 'lognormal' or 'poisson'")
+})
+
+test_that("function can correctly calculate confidence intervals around estimates", {
+
+})
+
+# TODO: add more checks once risk SMR is implemented
+test_that("type and shape of output data are expected based on input parameters", {
+  # option 1: rate SMR
+  out_01 <- get_smr(count = count, popn = popn, std_r = std_r)
+  expect_true(is.double(out_01))
+  expect_true(length(out_01) == 1)
+  expect_false(is.data.frame(out_01))
+
+  # option 2: expected number of events per stratum
+  out_02 <- get_smr(count = count, popn = popn, std_r = std_r, output_type = "counts")
+  expect_true(is.double(out_02))
+  expect_equal(length(std_r), length(out_02))
+  expect_false(is.data.frame(out_01))
+
+
+  # option 3: rate SMR with CI
+  out_03 <- get_smr(count = count, popn = popn, std_r = std_r, dist = "poisson", interval = 0.95)
+  expect_true(is.data.frame(out_03))
+  expect_equal(ncol(out_03), 4)
+  expect_true(setequal(c("smr", "lower", "upper", "interval"), colnames(out_03)))
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

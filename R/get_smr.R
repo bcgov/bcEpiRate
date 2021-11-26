@@ -86,14 +86,14 @@ get_smr <- function(count, popn, std_r, measure = "rate",
     stop("`popn` must be a numeric vector of non-negative integers")
   }
 
-  # TODO: check if rates/ratios are valid separately when risk SMR is added
+  # TODO: check if rates/risk are valid separately when risk SMR is added
   if (!is.numeric(std_r)) {
     stop("`std_r` must be a numeric vector")
   }
 
   # TODO: relax check when risk SMR is added
   if (measure != "rate") {
-    stop("function currenly only supports rate-standardized mortality ratios")
+    stop("function currently only supports rate-SMR")
   }
 
   if (!output_type %in% c("ratio", "counts")) {

@@ -57,7 +57,7 @@
 #' supplied, the directly standardized rate is returned as a numeric vector.
 #'
 #' If `output_type = "rate"` and both `dist` and `interval` are provided, then a
-#' data frame is returned with the columns `rate`, `lower`, `upper` and
+#' data frame is returned with the columns `dsr`, `lower`, `upper` and
 #' `interval`.
 #'
 #' If `output_type = "counts"`, the expected counts are returned as a numeric
