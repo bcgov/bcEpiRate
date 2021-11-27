@@ -36,9 +36,9 @@ test_that("error thrown when `std_r` is invalid", {
 })
 
 # TODO: relax test when risk SMR is implemented
-test_that("error thrown when `measure` is invalid", {
-  expect_error(get_smr(count = count, popn = popn, std_r = std_r, measure = "risk"),
-               "function currently only supports rate-SMR")
+test_that("error thrown when `std_measure` is invalid", {
+  expect_error(get_smr(count = count, popn = popn, std_r = std_r, std_measure = "risk"),
+               "function currently only supports rates from the standard population")
 })
 
 test_that("error thrown when `output_type` is invalid", {

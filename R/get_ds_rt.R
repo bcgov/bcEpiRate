@@ -47,10 +47,7 @@
 #' stratum in the standard population are provided in the same order.
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
-#' supplied to both `dist` and `interval`. In general, *the normal distribution
-#' should not be used to construct confidence intervals when the standard
-#' deviation is greater than a third of the mean*. A warning is raised if this
-#' is the case.
+#' supplied to both `dist` and `interval`.
 #'
 #' @return
 #' If `output_type = "rate"` (default) and neither `dist` nor `interval` is
@@ -97,6 +94,7 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_gamma()]
 #' @export
 get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
                       output_type = "rate", clean_strata = "none",

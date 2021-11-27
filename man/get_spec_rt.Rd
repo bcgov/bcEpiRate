@@ -68,10 +68,7 @@ fraction were valid numbers.
 }
 
 To construct confidence intervals for the rate estimates, arguments must be
-supplied to both \code{dist} and \code{interval}. In general, \emph{the normal distribution
-should not be used to construct confidence intervals when the standard
-deviation is greater than a third of the mean}. A warning is raised if this
-is the case.
+supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{
@@ -103,4 +100,7 @@ df <- df \%>\%
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}
 }

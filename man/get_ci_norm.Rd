@@ -28,7 +28,9 @@ that the values of the input arguments \code{estimate} and \code{variance} are a
 and that the vectors are the same length.
 
 This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}} and
-\code{\link[=get_ds_rt]{get_ds_rt()}}.
+\code{\link[=get_ds_rt]{get_ds_rt()}}. In general, \emph{the normal distribution should not be used to construct
+confidence intervals when the standard deviation is greater than a third of
+the mean}. The function throws a warning if this is the case.
 }
 \examples{
 \dontrun{

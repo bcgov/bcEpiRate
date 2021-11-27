@@ -33,10 +33,7 @@
 #' fraction were valid numbers.
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
-#' supplied to both `dist` and `interval`. In general, *the normal distribution
-#' should not be used to construct confidence intervals when the standard
-#' deviation is greater than a third of the mean*. A warning is raised if this
-#' is the case.
+#' supplied to both `dist` and `interval`.
 #'
 #' @return
 #' If `output_status = FALSE` and neither `dist` or `interval` is supplied, a
@@ -79,6 +76,7 @@
 #'
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_pois()]
 #' @export
 get_spec_rt <- function(counts, popn, scale = NULL, power = NULL, output_status = FALSE,
                         dist = NULL, interval = NULL) {

@@ -1,15 +1,17 @@
 #' Calculate a standardized morbidity/mortality ratio
 #'
 #' @description Calculate a standardized morbidity/mortality ratio (SMR) or the
-#' expected number of events in each stratum.
+#' expected number of events in each stratum. The SMR is the number of observed
+#' events divided by the expected events.
 #'
 #' @param count A scalar, the number of observed events.
 #' @param popn A numeric vector containing the size of each stratum in the observed
 #' population.
 #' @param std_r A numeric vector containing the rate or risk of each stratum in
 #' the standard population.
-#' @param measure A string to indicate which type of SMR to calculate. Currently,
-#' this function only supports the calculation of rate SMRs (default is `"rate"`).
+#' @param std_measure A string to indicate whether the values in `std_r` are rates
+#' or risks, which is used to calculate the expected number of events in each stratum.
+#' Currently, this function only supports the calculation of rate SMRs (default is `"rate"`).
 #' The calculation of risk SMRs will be implemented in the future.
 #' @param output_type If `"ratio"` (default), the SMR is returned. If `"counts"`,
 #' the expected number of events in each stratum is returned.
@@ -61,8 +63,9 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_pois()]
 #' @export
-get_smr <- function(count, popn, std_r, measure = "rate",
+get_smr <- function(count, popn, std_r, std_measure = "rate",
                     output_type = "ratio", percent = FALSE,
                     dist = NULL, interval = NULL) {
 
@@ -92,8 +95,8 @@ get_smr <- function(count, popn, std_r, measure = "rate",
   }
 
   # TODO: relax check when risk SMR is added
-  if (measure != "rate") {
-    stop("function currently only supports rate-SMR")
+  if (std_measure != "rate") {
+    stop("function currently only supports rates from the standard population")
   }
 
   if (!output_type %in% c("ratio", "counts")) {
@@ -124,13 +127,13 @@ get_smr <- function(count, popn, std_r, measure = "rate",
     # check validity of distribution name, calculate confidence intervals
     dist_name <- get_dist_name(dist)
     if (dist_name == "normal") {
-      if (measure == "rate") {
+      if (std_measure == "rate") {
         var <- smr / total_expected
         ci <- get_ci_norm(interval = interval, estimate = smr, variance = var)
       }
       # TODO: add another block for calculating variance of risk SMR
     } else if (dist_name == "lognormal") {
-      if (measure == "rate") {
+      if (std_measure == "rate") {
         var_log <- 1 / count
         ci <- get_ci_lnorm(interval = interval, estimate = smr, variance_log = var_log)
       }

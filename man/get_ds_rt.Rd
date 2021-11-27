@@ -86,10 +86,7 @@ the size of each stratum in the observed population and the size of each
 stratum in the standard population are provided in the same order.
 
 To construct confidence intervals for the rate estimates, arguments must be
-supplied to both \code{dist} and \code{interval}. In general, \emph{the normal distribution
-should not be used to construct confidence intervals when the standard
-deviation is greater than a third of the mean}. A warning is raised if this
-is the case.
+supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{
@@ -124,4 +121,7 @@ get_ds_rt(df$counts, df$popn, df$std_popn, power = 3)
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_gamma]{get_ci_gamma()}}
 }

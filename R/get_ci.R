@@ -13,7 +13,9 @@
 #' and that the vectors are the same length.
 #'
 #' This function is used to construct confidence intervals in [get_spec_rt()] and
-#' [get_ds_rt()].
+#' [get_ds_rt()]. In general, *the normal distribution should not be used to construct
+#' confidence intervals when the standard deviation is greater than a third of
+#' the mean*. The function throws a warning if this is the case.
 #'
 #' @return A data frame with columns `lower` and `upper` which contain the lower
 #' and upper limits of a confidence interval respectively.
@@ -79,7 +81,7 @@ get_ci_norm <- function(interval, estimate, variance) {
   # define alpha
   alpha <- 1 - interval
 
-  # check if distribution should be avoide
+  # check if distribution should be avoided
   sd <- sqrt(variance)
   threshold <- (1 - 0.997) / 2
   mass_below_0 <- stats::pnorm(0, mean = estimate, sd = sd)

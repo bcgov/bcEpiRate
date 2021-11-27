@@ -8,7 +8,7 @@ get_smr(
   count,
   popn,
   std_r,
-  measure = "rate",
+  std_measure = "rate",
   output_type = "ratio",
   percent = FALSE,
   dist = NULL,
@@ -24,8 +24,9 @@ population.}
 \item{std_r}{A numeric vector containing the rate or risk of each stratum in
 the standard population.}
 
-\item{measure}{A string to indicate which type of SMR to calculate. Currently,
-this function only supports the calculation of rate SMRs (default is \code{"rate"}).
+\item{std_measure}{A string to indicate whether the values in \code{std_r} are rates
+or risks, which is used to calculate the expected number of events in each stratum.
+Currently, this function only supports the calculation of rate SMRs (default is \code{"rate"}).
 The calculation of risk SMRs will be implemented in the future.}
 
 \item{output_type}{If \code{"ratio"} (default), the SMR is returned. If \code{"counts"},
@@ -54,7 +55,8 @@ is returned as a numeric vector.
 }
 \description{
 Calculate a standardized morbidity/mortality ratio (SMR) or the
-expected number of events in each stratum.
+expected number of events in each stratum. The SMR is the number of observed
+events divided by the expected events.
 }
 \details{
 This low-level function assumes that the size of each stratum in the
@@ -86,4 +88,7 @@ get_smr(
 }
 \references{
 \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}
 }
