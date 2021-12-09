@@ -3,11 +3,11 @@ title: "bcEpiRate"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{bcEpiRate}
-  %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 editor_options: 
   markdown: 
-    wrap: 72
+    wrap: 72  
 ---
 
 ```{r, include = FALSE}
@@ -355,9 +355,9 @@ In just a few lines of code, we have calculated age-standardized
 mortality rates (per 100,000 population) along with their confidence
 intervals for 5 different causes of death over 5 years.
 
-## Example 6: Calculating the standard mortality ratio for Disease D in 2016
+## Example 6: Calculating the standardized mortality ratio for Disease D in 2016
 
-The **standard mortality ratio (SMR)** is a ratio between the number of
+The **standardized mortality ratio (SMR)** is a ratio between the number of
 observed deaths in the study population and the number of expected
 deaths in the standard population. When the ratio is greater than 1, it
 suggests that there is excess mortality in the study population. On the
@@ -371,16 +371,40 @@ population. Let's say that 278 people died from Disease D in 2016:
 
 ```{r example-06}
 # define number of observed deaths
-
+count_06 <- 278
 
 # filter study population size by year of interest
+popn_06 <- population %>%
+  filter(year == 2016) %>%
+  group_by(age_group) %>% # aggregate population count by age group
+  summarise(popn = sum(popn), .groups = "drop") %>%
+  pull(popn)
 
 # filter age-specific mortality rates by disease of interest
-
-  
-# calculate SMR
-
+std_rt_06 <- death_rates %>%
+  filter(disease == "Disease D") %>%
+  pull(std_rt)
 ```
+
+Let's construct a 95% confidence interval around the estimate:
+
+```{r example-06-get-smr}
+df_06 <- get_smr(
+  count = count_06, popn = popn_06, std_r = std_rt_06,
+  std_measure = "rate", dist = "normal", interval = 0.95
+)
+df_06
+```
+
+```{r example-06-text, include=FALSE}
+# store all values for summary
+df_06 <- df_06 %>%
+  mutate(across(.cols = c(smr, lower, upper), ~ round(.x, 2)))
+```
+
+The SMR for Disease D in 2016 was `r df_06$smr`; 95% CI
+[`r df_06$lower`, `r df_06$upper`]. The number of deaths in the study
+was approximately `r df_06$smr * 100`% of the expected number of deaths.
 
 ## 🤹 Exception handling
 
