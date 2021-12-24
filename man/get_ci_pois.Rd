@@ -14,12 +14,12 @@ interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 stratum-specific number of events or the observed number of events in the
 study population.}
 
-\item{y}{A vector of positive values. It can contain the population-time for
+\item{y}{A vector of positive numbers. It can contain the population-time for
 each stratum or the expected number of events. The default value is \code{NULL}.}
 }
 \value{
-A data frame with columns \code{lower} and \code{upper} which contain the lower
-and upper limits of a confidence interval respectively.
+A data frame with columns \code{lower} and \code{upper}, which contain the lower
+and upper limits of a confidence interval, respectively.
 }
 \description{
 Calculate a Poisson distribution confidence interval. This
@@ -28,14 +28,14 @@ continuous extension of the estimate.
 }
 \details{
 When working with rates, pass the stratum-specific
-number of events into \code{x} and the population-time for each stratum into \code{y}.
+number of events as \code{x} and the population-time for each stratum as \code{y}.
 When working with standardized morbidity/mortality ratios, pass the observed
-number of events into \code{x} and the expected number of events into \code{y}. Ensure
+number of events as \code{x} and the expected number of events as \code{y}. Ensure
 that the values of \code{x} and \code{y} are aligned and that the vectors are the same
 length.
 
 To calculate a confidence interval around count data, pass a vector
-of counts into \code{x}.
+of counts as \code{x}.
 
 This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }

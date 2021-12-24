@@ -47,7 +47,7 @@
 #' stratum in the standard population are provided in the same order.
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
-#' supplied to both `dist` and `interval`.
+#' explicitly supplied to both `dist` and `interval`.
 #'
 #' @return
 #' If `output_type = "rate"` (default) and neither `dist` nor `interval` is

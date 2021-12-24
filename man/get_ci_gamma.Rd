@@ -18,12 +18,12 @@ weights of each strata in the directly standardized rate calculation.}
 \item{variance}{A numeric vector containing the variances.}
 
 \item{method}{A string to indicate which method to use to calculate the
-confidence interval. The default is \code{"tcz06"} which refers to the method
+confidence interval. The default is \code{"tcz06"}, which refers to the method
 proposed by Tiwari, Clegg, and Zou (2006). Use \code{"ff97"} for a more
-conservative (wider) confidence interval proposed by Fay and Feuer (1997).}
+conservative (wider) confidence interval, as proposed by Fay and Feuer (1997).}
 }
 \value{
-A data frame with columns \code{lower} and \code{upper} which contain the lower
+A data frame with columns \code{lower} and \code{upper}, which contain the lower
 and upper limits of a confidence interval, respectively.
 }
 \description{

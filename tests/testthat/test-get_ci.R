@@ -22,7 +22,7 @@ test_that("function throws an error when `estimate` is invalid", {
   )
 })
 
-test_that("function throws an error `variance` is invalid", {
+test_that("function throws an error when `variance` is invalid", {
   expect_error(
     get_ci_norm(interval = 0.9, estimate = 10, variance = "hello"),
     "`variance` must be numeric and greater than or equal to 0"
@@ -60,7 +60,7 @@ df_norm_02 <- data.frame(
 test_that("function can calculate confidence intervals for multiple estimates using normal distribution", {
   expect_equal(
     get_ci_norm(interval = 0.95, estimate = c(10, 20), variance = c(4, 9)),
-    rbind(df_norm, df_norm_02)
+    dplyr::bind_rows(df_norm, df_norm_02)
   )
 })
 
@@ -141,7 +141,7 @@ df_lnorm_02 <- data.frame(
 test_that("function can calculate confidence intervals for multiple estimates using log normal distribution", {
   expect_equal(
     get_ci_lnorm(interval = 0.95, estimate = c(0.4, 0.25), variance_log = c(0.025, 0.04)),
-    rbind(df_lnorm, df_lnorm_02)
+    dplyr::bind_rows(df_lnorm, df_lnorm_02)
   )
 })
 
@@ -227,7 +227,7 @@ df_pois_02 <- data.frame(
 test_that("function can calculate confidence intervals for multiple estimates using Poisson distribution", {
   expect_equal(
     get_ci_pois(interval = 0.95, x = c(97, 50), y = c(39570, 47516)),
-    rbind(df_pois, df_pois_02)
+    dplyr::bind_rows(df_pois, df_pois_02)
   )
 })
 
@@ -389,7 +389,7 @@ test_that("function can calculate confidence intervals for multiple estimates us
       interval = 0.9, estimate = c(0.015, 0.004),
       weights = list(w, w_02), variance = c(1e-06, 1e-08)
     ),
-    rbind(df_gamma, df_gamma_02)
+    dplyr::bind_rows(df_gamma, df_gamma_02)
   )
 })
 

@@ -8,7 +8,7 @@
 #' @param variance A numeric vector containing the variances.
 #'
 #' @details This function doesn't need to know which type of epidemiological
-#' measure has been passed to `estimate` (e.g., rate, risk). It also assumes
+#' measure has been passed as `estimate` (e.g., rate, risk). It also assumes
 #' that the values of the input arguments `estimate` and `variance` are aligned
 #' and that the vectors are the same length.
 #'
@@ -17,8 +17,8 @@
 #' confidence intervals when the standard deviation is greater than a third of
 #' the mean*. The function throws a warning if this is the case.
 #'
-#' @return A data frame with columns `lower` and `upper` which contain the lower
-#' and upper limits of a confidence interval respectively.
+#' @return A data frame with columns `lower` and `upper`, which contain the lower
+#' and upper limits of a confidence interval, respectively.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
@@ -116,15 +116,15 @@ get_ci_norm <- function(interval, estimate, variance) {
 #' log-transformed `estimate`.
 #'
 #' @details This function doesn't need to know which type of epidemiological
-#' measure has been passed to `estimate` (e.g., rate, risk). It also assumes
+#' measure has been passed as `estimate` (e.g., rate, risk). It also assumes
 #' that the values of the input arguments `estimate` and `variance_log` are aligned
 #' and that the vectors are the same length.
 #'
 #' This function is used to construct confidence intervals in [get_spec_rt()] and
 #' [get_ds_rt()].
 #'
-#' @return A data frame with columns `lower` and `upper` which contain the lower
-#' and upper limits of a confidence interval respectively.
+#' @return A data frame with columns `lower` and `upper`, which contain the lower
+#' and upper limits of a confidence interval, respectively.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
@@ -207,23 +207,23 @@ get_ci_lnorm <- function(interval, estimate, variance_log) {
 #' @param x A numeric vector of positive integers. It can contain the
 #' stratum-specific number of events or the observed number of events in the
 #' study population.
-#' @param y A vector of positive values. It can contain the population-time for
+#' @param y A vector of positive numbers. It can contain the population-time for
 #' each stratum or the expected number of events. The default value is `NULL`.
 #'
 #' @details When working with rates, pass the stratum-specific
-#' number of events into `x` and the population-time for each stratum into `y`.
+#' number of events as `x` and the population-time for each stratum as `y`.
 #' When working with standardized morbidity/mortality ratios, pass the observed
-#' number of events into `x` and the expected number of events into `y`. Ensure
+#' number of events as `x` and the expected number of events as `y`. Ensure
 #' that the values of `x` and `y` are aligned and that the vectors are the same
 #' length.
 #'
 #' To calculate a confidence interval around count data, pass a vector
-#' of counts into `x`.
+#' of counts as `x`.
 #'
 #' This function is used to construct confidence intervals in [get_spec_rt()].
 #'
-#' @return A data frame with columns `lower` and `upper` which contain the lower
-#' and upper limits of a confidence interval respectively.
+#' @return A data frame with columns `lower` and `upper`, which contain the lower
+#' and upper limits of a confidence interval, respectively.
 #'
 #' @examples
 #' \dontrun{
@@ -320,9 +320,9 @@ get_ci_pois <- function(interval, x, y = NULL) {
 #' weights of each strata in the directly standardized rate calculation.
 #' @param variance A numeric vector containing the variances.
 #' @param method A string to indicate which method to use to calculate the
-#' confidence interval. The default is `"tcz06"` which refers to the method
+#' confidence interval. The default is `"tcz06"`, which refers to the method
 #' proposed by Tiwari, Clegg, and Zou (2006). Use `"ff97"` for a more
-#' conservative (wider) confidence interval proposed by Fay and Feuer (1997).
+#' conservative (wider) confidence interval, as proposed by Fay and Feuer (1997).
 #'
 #' @details This function assumes that the values of the input arguments
 #' `estimate`, `weights`, and `variance` are aligned and that they are the same
@@ -330,7 +330,7 @@ get_ci_pois <- function(interval, x, y = NULL) {
 #'
 #' This function is used to construct confidence intervals in [get_ds_rt()].
 #'
-#' @return A data frame with columns `lower` and `upper` which contain the lower
+#' @return A data frame with columns `lower` and `upper`, which contain the lower
 #' and upper limits of a confidence interval, respectively.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}

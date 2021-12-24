@@ -68,7 +68,7 @@ fraction were valid numbers.
 }
 
 To construct confidence intervals for the rate estimates, arguments must be
-supplied to both \code{dist} and \code{interval}.
+explicitly supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{

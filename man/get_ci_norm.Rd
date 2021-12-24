@@ -15,15 +15,15 @@ interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 \item{variance}{A numeric vector containing the variances.}
 }
 \value{
-A data frame with columns \code{lower} and \code{upper} which contain the lower
-and upper limits of a confidence interval respectively.
+A data frame with columns \code{lower} and \code{upper}, which contain the lower
+and upper limits of a confidence interval, respectively.
 }
 \description{
 Calculate a normal distribution confidence interval.
 }
 \details{
 This function doesn't need to know which type of epidemiological
-measure has been passed to \code{estimate} (e.g., rate, risk). It also assumes
+measure has been passed as \code{estimate} (e.g., rate, risk). It also assumes
 that the values of the input arguments \code{estimate} and \code{variance} are aligned
 and that the vectors are the same length.
 

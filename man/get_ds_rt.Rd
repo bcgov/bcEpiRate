@@ -86,7 +86,7 @@ the size of each stratum in the observed population and the size of each
 stratum in the standard population are provided in the same order.
 
 To construct confidence intervals for the rate estimates, arguments must be
-supplied to both \code{dist} and \code{interval}.
+explicitly supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{

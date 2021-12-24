@@ -33,7 +33,7 @@
 #' fraction were valid numbers.
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
-#' supplied to both `dist` and `interval`.
+#' explicitly supplied to both `dist` and `interval`.
 #'
 #' @return
 #' If `output_status = FALSE` and neither `dist` or `interval` is supplied, a
