@@ -47,6 +47,15 @@ additional columns:
 \item If both \code{dist} and \code{interval} are provided, then the columns \code{interval},
 \code{lower}, and \code{upper} are also included.
 }
+
+The \code{status} column of the output can be interpreted as follows:
+\itemize{
+\item \code{"has_NA"} indicates that the numerator and/or denominator of the fraction
+was NA.
+\item \code{"denom_0"} indicates that the denominator of the fraction was 0.
+\item \code{"success"} indicates that both the numerator and denominator of the
+fraction were valid numbers.
+}
 }
 \description{
 Calculate specific rates given a vector containing the frequencies of events
@@ -57,15 +66,6 @@ This low-level function assumes that counts and sizes of respective
 subpopulations are provided in the same order. It can also be used to
 calculate a crude rate if \code{counts} and \code{popn} are scalars and represent the
 sum of all counts and the size of the entire population respectively.
-
-The \code{status} column of the output can be interpreted as follows:
-\itemize{
-\item \code{"has_NA"} indicates that the numerator and/or denominator of the fraction
-was NA.
-\item \code{"denom_0"} indicates that the denominator of the fraction was 0.
-\item \code{"success"} indicates that both the numerator and denominator of the
-fraction were valid numbers.
-}
 
 To construct confidence intervals for the rate estimates, arguments must be
 explicitly supplied to both \code{dist} and \code{interval}.

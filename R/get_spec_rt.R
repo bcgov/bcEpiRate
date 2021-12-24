@@ -25,13 +25,6 @@
 #' calculate a crude rate if `counts` and `popn` are scalars and represent the
 #' sum of all counts and the size of the entire population respectively.
 #'
-#' The `status` column of the output can be interpreted as follows:
-#' * `"has_NA"` indicates that the numerator and/or denominator of the fraction
-#' was NA.
-#' * `"denom_0"` indicates that the denominator of the fraction was 0.
-#' * `"success"` indicates that both the numerator and denominator of the
-#' fraction were valid numbers.
-#'
 #' To construct confidence intervals for the rate estimates, arguments must be
 #' explicitly supplied to both `dist` and `interval`.
 #'
@@ -44,6 +37,13 @@
 #'  * If `output_status = TRUE`, then the column `status` is included.
 #'  * If both `dist` and `interval` are provided, then the columns `interval`,
 #'  `lower`, and `upper` are also included.
+#'
+#' The `status` column of the output can be interpreted as follows:
+#' * `"has_NA"` indicates that the numerator and/or denominator of the fraction
+#' was NA.
+#' * `"denom_0"` indicates that the denominator of the fraction was 0.
+#' * `"success"` indicates that both the numerator and denominator of the
+#' fraction were valid numbers.
 #'
 #' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
