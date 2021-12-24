@@ -2,52 +2,93 @@
 % Please edit documentation in R/get_smr.R
 \name{get_smr}
 \alias{get_smr}
-\title{Perform indirect rate standardization}
+\title{Calculate a standardized morbidity/mortality ratio}
 \usage{
-get_smr(count, popn, std_rt, output_type = "ratio", percent = FALSE)
+get_smr(
+  count,
+  popn,
+  std_r,
+  std_measure = "rate",
+  output_type = "ratio",
+  percent = FALSE,
+  dist = NULL,
+  interval = NULL
+)
 }
 \arguments{
-\item{count}{A scalar, the number of observed deaths.}
+\item{count}{A scalar, the number of observed events.}
 
-\item{popn}{A numeric vector containing the size of each defined population.}
-
-\item{std_rt}{A numeric vector containing the specific rate (expressed as
-the number of cases per unit of population) for each stratum in the standard
+\item{popn}{A numeric vector containing the size of each stratum in the observed
 population.}
 
-\item{output_type}{If \code{"ratio"} (default), only the SMR is returned. If \code{"counts"},
-the expected number of deaths for each stratum in the observed population is
-returned as a vector.}
+\item{std_r}{A numeric vector containing the rate or risk of each stratum in
+the standard population.}
 
-\item{percent}{If \code{FALSE} (default), the SMR is returned as is (e.g. 0.5). If \code{TRUE}, the
-SMR is expressed as a percentage (e.g. 50).}
+\item{std_measure}{A string to indicate whether the values in \code{std_r} are rates
+or risks, which is used to calculate the expected number of events in each stratum.
+Currently, this function only supports the calculation of rate SMRs (default is \code{"rate"}).
+The calculation of risk SMRs will be implemented in the future.}
+
+\item{output_type}{If \code{"ratio"} (default), the SMR is returned. If \code{"counts"},
+the expected number of events in each stratum is returned.}
+
+\item{percent}{If \code{FALSE} (default), the SMR is returned as is (e.g. 0.5). If
+\code{TRUE}, the SMR is expressed as a percentage (e.g. 50).}
+
+\item{dist}{A string to indicate the type of probability distribution for the
+confidence interval to follow. Can be one of the following: \code{"normal"},
+\code{"log normal"} or \code{"poisson"}. This parameter is case insensitive.}
+
+\item{interval}{A scalar, between 0 and 1, indicating the width of the
+confidence interval. For example, for a 95\% confidence interval, use
+\code{interval = 0.95}.}
 }
 \value{
-Either the SMR as a scalar or an array of the expected counts for
-each stratum.
+If \code{output_type == "ratio"} (default) and neither \code{dist} nor \code{interval}
+is supplied, the SMR is returned as a numeric vector.
+
+If \code{output_type == "ratio"} and both \code{dist} and \code{interval} are provided, then a
+data frame with the columns \code{smr}, \code{lower}, \code{upper} and \code{interval} is returned.
+
+If \code{output_type == "counts"}, the expected number of events in each stratum
+is returned as a numeric vector.
 }
 \description{
-Compute a standardized mortality ratio (SMR) or expected number
-of deaths given the number of observed deaths, the size of each stratum in the
-observed population, and the specific rate for each stratum in the standard
-population.
+Calculate a standardized morbidity/mortality ratio (SMR) or the
+expected number of events in each stratum. The SMR is the number of observed
+events divided by the expected events.
 }
 \details{
 This low-level function assumes that the size of each stratum in the
-observed population and the specific rate for the respective stratum in the
-standard population are provided in the same order.
+observed population and the rate or risk of each stratum in the standard
+population are provided in the same order.
+
+To construct confidence intervals for the ratio estimates, arguments must be
+supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{
 count <- 1500
-popn <- c(150000, 55000, 12000)
-std_rt <- c(0.001, 0.003, 0.05)
+popn <- c(13358, 13029, 34378, 39649, 11671)
+std_r <- c(0.004, 0.003, 0.007, 0.011, 0.013)
 
-get_smr(count, popn, std_rt)
-get_smr(count, popn, std_rt, output_type = "ratio")
-get_smr(count, popn, std_rt, output_type = "counts")
-get_smr(count, popn, std_rt, percent = FALSE)
-get_smr(count, popn, std_rt, percent = TRUE)
+get_smr(count = count, popn = popn, std_r = std_r, output_type = "ratio")
+get_smr(count = count, popn = popn, std_r = std_r, output_type = "counts")
+get_smr(count = count, popn = popn, std_r = std_r, percent = TRUE)
+get_smr(
+  count = count, popn = popn, std_r = std_r,
+  dist = "normal", interval = 0.95
+)
+get_smr(
+  count = count, popn = popn, std_r = std_r,
+  percent = TRUE, dist = "normal", interval = 0.95
+)
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}
 }

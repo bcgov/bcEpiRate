@@ -17,10 +17,8 @@ and epidemiology
 -   `get_ds_rt()` calculates a directly standardized rate and constructs
     a confidence interval around the estimate using a user-specified
     standard population.
--   `get_smr()` performs indirect rate standardization to calculate the
-    standardized mortality ratio (SMR).
--   `get_ci()` is a helper function used in the above functions but can
-    also be called directly by the user.
+-   `get_smr()` calculates a standardized morbidity/mortality ratio and
+    constructs a confidence interval around the estimate.
 
 This package is inspired by the R package
 [dsr](https://cran.r-project.org/web/packages/dsr/index.html), which has
@@ -57,10 +55,8 @@ browseVignettes("bcEpiRate")
 
 ### Project Status
 
-Currently, this package is composed of four functions. In the coming
-months, there are plans to add features for calculating measures of
-association (e.g. risk ratio, rate ratio) and estimating confidence
-intervals using additional probability distributions.
+In the coming months, there are plans to add features for calculating
+measures of association (e.g., risk ratio, rate ratio).
 
 ### Getting Help or Reporting an Issue
 
@@ -83,7 +79,7 @@ to abide by its terms.
 
       Reiko Okamoto, Henry Ngo and Ioana Sevcenco (2021). bcEpiRate: Tools
       for Standardized Rates in Population Health Surveillance and
-      Epidemiology. R package version 0.1.0.
+      Epidemiology. R package version 1.0.0.
       https://github.com/bcgov/bcEpiRate
 
     A BibTeX entry for LaTeX users is
@@ -92,7 +88,7 @@ to abide by its terms.
         title = {bcEpiRate: Tools for Standardized Rates in Population Health Surveillance and Epidemiology},
         author = {Reiko Okamoto and Henry Ngo and Ioana Sevcenco},
         year = {2021},
-        note = {R package version 0.1.0},
+        note = {R package version 1.0.0},
         url = {https://github.com/bcgov/bcEpiRate},
       }
 

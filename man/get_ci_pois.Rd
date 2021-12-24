@@ -2,32 +2,64 @@
 % Please edit documentation in R/get_ci.R
 \name{get_ci_pois}
 \alias{get_ci_pois}
-\title{Replicate \code{stats::qpois} using \code{stats::qchisq}}
+\title{Calculate a Poisson distribution confidence interval}
 \usage{
-get_ci_pois(q_low, q_high, estimate, denominator)
+get_ci_pois(interval, x, y = NULL)
 }
 \arguments{
-\item{q_low}{A scalar, indicating the lower limit}
+\item{interval}{A scalar between 0 and 1, indicating the width of the
+interval. For example, use \code{0.95} to calculate a 95\% confidence interval.}
 
-\item{q_high}{A scalar, indicating the upper limit}
+\item{x}{A numeric vector of positive integers. It can contain the
+stratum-specific number of events or the observed number of events in the
+study population.}
 
-\item{estimate}{A scalar, must be a whole number (e.g. number of events)}
-
-\item{denominator}{A scalar (e.g. population-time)}
+\item{y}{A vector of positive numbers. It can contain the population-time for
+each stratum or the expected number of events. The default value is \code{NULL}.}
 }
 \value{
-A numeric vector containing the lower and upper limits
+A data frame with columns \code{lower} and \code{upper}, which contain the lower
+and upper limits of a confidence interval, respectively.
 }
 \description{
-This function implements the Poisson distribution using the
-chi-squared distribution to allow for the continuous extension of integer
-variable (\code{estimate}). Read p.9385 of the \href{https://support.sas.com/documentation/onlinedoc/stat/151/stdrate.pdf}{STDRATE Procedure}
-for more information.
+Calculate a Poisson distribution confidence interval. This
+function imitates \code{\link[stats:Poisson]{stats::qpois()}} using \code{\link[stats:Chisquare]{stats::qchisq()}} to allow for the
+continuous extension of the estimate.
+}
+\details{
+When working with rates, pass the stratum-specific
+number of events as \code{x} and the population-time for each stratum as \code{y}.
+When working with standardized morbidity/mortality ratios, pass the observed
+number of events as \code{x} and the expected number of events as \code{y}. Ensure
+that the values of \code{x} and \code{y} are aligned and that the vectors are the same
+length.
+
+To calculate a confidence interval around count data, pass a vector
+of counts as \code{x}.
+
+This function is used to construct confidence intervals in \code{\link[=get_spec_rt]{get_spec_rt()}}.
 }
 \examples{
 \dontrun{
-get_ci_pois(q_low = 0.025, q_high = 0.975, estimate = 30, denominator = 1000)
+# calculate a single confidence interval
+get_ci_pois(interval = 0.95, x = 49, y = 52) # rate
+get_ci_pois(interval = 0.95, x = 11) # count
+
+# use columns of a data frame as inputs
+df <- data.frame(x = c(24, 49), y = c(94, 52))
+
+# using dplyr
+df \%>\%
+  dplyr::mutate(get_ci_pois(0.95, x, y))
+
+# using base
+get_ci_pois(0.95, df$x, df$y)
 }
 
 }
-\keyword{internal}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_gamma]{get_ci_gamma()}}
+}

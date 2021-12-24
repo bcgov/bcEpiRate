@@ -1,8 +1,8 @@
 #' Perform direct standardization
 #'
 #' @description Compute a directly standardized rate given the counts of events,
-#' the size of each defined population and the size of each group of the standard
-#' population.
+#' the size of each defined population and the size of each group of the
+#' standard population.
 #'
 #' @param counts A numeric vector containing the frequency of events.
 #' @param popn A numeric vector containing the size of each defined population.
@@ -10,10 +10,11 @@
 #' standard population.
 #' @param scale,power Provide either `scale`, a positive integer, to specify the
 #' scale, or `power`, a non-negative integer, to specify the power of 10 to use
-#' when expressing the result. If neither argument is supplied, `scale = 1` will be
-#' applied.
-#' @param output_type If `"rate"` (default), the directly standardized rate is returned.
-#' If `"counts"`, the expected number of events for each stratum is returned.
+#' when expressing the result. If neither argument is supplied, `scale = 1` will
+#' be applied.
+#' @param output_type If `"rate"` (default), the directly standardized rate is
+#' returned. If `"counts"`, the expected number of events for each stratum is
+#' returned.
 #' @param clean_strata
 #'
 #'  * `"none"` returns a directly standardized rate if and only if the evaluated
@@ -22,34 +23,44 @@
 #'  values of `NA` or `0` from the calculation of the directly standardized rate.
 #'  `NA` is returned if all strata are excluded from the calculation.
 #'  * `"zero"` sets specific rates evaluated to `NA` as 0. In addition, when
-#'  `std_popn` contains 0, the respective stratum is excluded from the calculation of
-#'  the directly standardized rate. However, when `std_popn` contains `NA`, the
-#'  directly standardized rate is evaluated to `NA`. When `output_type = "counts"`,
-#'  the expected counts are calculated *after* specific rates of `NA` have been set to 0.
-#'  *Confidence intervals cannot be constructed when this argument is used.*
+#'  `std_popn` contains 0, the respective stratum is excluded from the
+#'  calculation of the directly standardized rate. However, when `std_popn`
+#'  contains `NA`, the directly standardized rate evaluates to `NA`. When
+#'  `output_type = "counts"`, the expected counts are calculated *after*
+#'  specific rates of `NA` have been set to 0. *Confidence intervals cannot be
+#'  constructed when this argument is used.*
 #' @param dist A string to indicate the type of probability distribution for the
-#' confidence interval to follow. Can be either `"normal"` or `"log normal"`.
-#' This parameter is case insensitive.
+#' confidence interval to follow. Can be either `"normal"`, `"log normal"` or
+#' `"gamma"`. This parameter is case insensitive.
 #' @param interval A scalar, between 0 and 1, indicating the width of the
-#' confidence interval. For example, for a 95% confidence interval, use `interval = 0.95`.
+#' confidence interval. For example, for a 95% confidence interval, use
+#' `interval = 0.95`.
+#' @param method A string specifying the method to use when using the gamma
+#' distribution. Use `"tcz06"` (default) for the method proposed by Tiwari,
+#' Clegg, and Zou (2006) and `"ff97"` for the more conservative method proposed
+#' by Fay and Feuer (1997). This parameter must be left empty when calculating
+#' confidence intervals using other distributions. See \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details14.htm#statug_stdrate002267}{SAS Help Center: Direct Standardization}
+#' for more details.
 #'
 #' @details This low-level function assumes that the counts in each stratum,
 #' the size of each stratum in the observed population and the size of each
 #' stratum in the standard population are provided in the same order.
 #'
 #' To construct confidence intervals for the rate estimates, arguments must be
-#' supplied to both `dist` and `interval`. In general, *the normal distribution
-#' should not be used to construct confidence intervals when the standard deviation
-#' is greater than a third of the mean*. The function throws a warning if this is the case.
+#' explicitly supplied to both `dist` and `interval`.
 #'
 #' @return
-#' If `output_type = "rate"` (default) and neither `dist` or `interval` is supplied,
-#' the directly standardized rate is returned as a numeric vector.
+#' If `output_type = "rate"` (default) and neither `dist` nor `interval` is
+#' supplied, the directly standardized rate is returned as a numeric vector.
 #'
 #' If `output_type = "rate"` and both `dist` and `interval` are provided, then a
-#' data frame is returned with the columns `rate`, `lower`, `upper` and `interval`.
+#' data frame is returned with the columns `dsr`, `lower`, `upper` and
+#' `interval`.
 #'
-#' If `output_type = "counts"`, the expected counts are returned as a numeric vector.
+#' If `output_type = "counts"`, the expected counts are returned as a numeric
+#' vector.
+#'
+#' @references \href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
 #'
 #' @examples
 #' \dontrun{
@@ -63,7 +74,16 @@
 #' get_ds_rt(counts, popn, std_popn, power = 3)
 #' get_ds_rt(counts, popn, std_popn, output_type = "counts")
 #' get_ds_rt(counts, popn, std_popn, clean_strata = "exclude")
-#' get_ds_rt(counts, popn, std_popn, scale = 1000, dist = "normal", interval = 0.95)
+#' get_ds_rt(
+#'   counts, popn, std_popn,
+#'   scale = 1000,
+#'   dist = "normal", interval = 0.95
+#' )
+#' get_ds_rt(
+#'   counts, popn, std_popn,
+#'   scale = 100000,
+#'   dist = "gamma", interval = 0.9, method = "ff97"
+#' )
 #'
 #' # using a data frame
 #' df <- data.frame(counts, popn, std_popn)
@@ -74,14 +94,15 @@
 #'
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @seealso [get_ci_norm()], [get_ci_lnorm()], [get_ci_gamma()]
 #' @export
 get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
                       output_type = "rate", clean_strata = "none",
-                      dist = NULL, interval = NULL) {
+                      dist = NULL, interval = NULL, method = NULL) {
 
   # check validity of inputs
 
-  if (length(unique(purrr::map(list(counts, popn, std_popn), length))) != 1) {
+  if (length(unique(purrr::map_dbl(list(counts, popn, std_popn), length))) != 1) {
     stop("input vectors must be the same length")
   }
 
@@ -101,12 +122,40 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     stop("`output_type` must be either 'rate' or 'counts'")
   }
 
+  if (!is.null(scale) & !is.null(power)) {
+    stop("must supply exactly one of `scale` and `power`")
+  }
+
   # set multiplier
-  if (!is.null(scale)) {
+  if (!is.null(scale)) { # if only `scale` is supplied
+    if (!is.numeric(scale)) {
+      stop("`scale` must be a positive integer of length 1")
+    }
+
+    if (length(scale) != 1) {
+      stop("`scale` must be a positive integer of length 1")
+    }
+
+    if (scale %% 1 != 0 | scale < 1) {
+      stop("`scale` must be a positive integer of length 1")
+    }
+
     multiplier <- scale
-  } else if (!is.null(power)) {
+  } else if (!is.null(power)) { # if only `power` is supplied
+    if (!is.numeric(power)) {
+      stop("`power` must be a non-negative integer of length 1")
+    }
+
+    if (length(power) != 1) {
+      stop("`power` must be a non-negative integer of length 1")
+    }
+
+    if (power %% 1 != 0 | power < 0) {
+      stop("`power` must be a non-negative integer of length 1")
+    }
+
     multiplier <- 10**power
-  } else {
+  } else { # if neither `scale` nor `power` is supplied, return the estimates as is (i.e. `scale` = 1)
     multiplier <- 1
   }
 
@@ -114,7 +163,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
   spec_rt <- get_spec_rt(counts, popn) %>%
     as.numeric()
 
-  df <- tibble::tibble(counts, popn, std_popn, spec_rt)
+  df <- data.frame(counts, popn, std_popn, spec_rt)
 
   # calculate directly standardized rate based on specified method
   if (clean_strata == "none") {
@@ -138,7 +187,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         ) %>%
         dplyr::select(.data$dsr)
     } else {
-      df_dsr <- tibble::tibble(dsr = NA_real_)
+      df_dsr <- data.frame(dsr = NA_real_)
     }
   } else if (clean_strata == "exclude") {
 
@@ -160,7 +209,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
         ) %>%
         dplyr::select(.data$dsr)
     } else {
-      (df_dsr <- tibble::tibble(dsr = NA_real_))
+      (df_dsr <- data.frame(dsr = NA_real_))
     }
   } else if (clean_strata == "zero") {
     # set specific rate of NA to 0 then calculate expected counts
@@ -183,36 +232,57 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     stop("both `dist` and `interval` must be supplied to construct confidence intervals")
   }
 
-  # check if confidence intervals should be constructed
   if (!is.null(dist) & !is.null(interval)) {
     if (clean_strata == "zero") {
       stop("construction of confidence interval with clean_strata = 'zero' not yet implemented")
     }
-    if (stringr::str_detect(dist, stringr::regex("^normal$", ignore_case = TRUE))) { # normal distribution
-      # calculate variance of directly standardized rate
-      var <- get_ds_rt_var(df)
-      threshold <- (1 - 0.997) / 2
-      check_value <- stats::pnorm(0, mean = df_dsr$dsr, sd = sqrt(var))
-      if (!is.na(check_value)) {
-        if (check_value > threshold) { # check if normal distribution should be avoided
-          warning("more than 0.15% of the probability mass lies below 0 for the estimate, consider using a different probability distribution")
-        }
+
+    # check validity of distribution name calculate confidence interval
+    dist_name <- get_dist_name(dist)
+    var <- get_ds_rt_var(df)
+
+    if (dist_name %in% c("normal", "lognormal")) {
+      if (!is.null(method)) {
+        stop("`method` must be NULL when `dist` is 'normal' or 'lognormal'")
       }
-    } else if (stringr::str_detect(dist, stringr::regex("^log", ignore_case = TRUE))) { # log normal distribution
-      # calculate variance of directly standardized rate
-      var <- get_ds_rt_var(df)
-    } else {
-      stop("this function can only construct confidence intervals using normal and log normal distributions")
     }
 
-    # construct confidence intervals
+    if (dist_name == "normal") {
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(
+          get_ci_norm(interval = interval, estimate = .data$dsr, variance = var)
+        )
+    } else if (dist_name == "lognormal") {
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(
+          var_log = (1 / (.data$dsr**2)) * var, # estimation found in Direct Standardization section of STDRATE Procedure Details
+          get_ci_lnorm(interval = interval, estimate = .data$dsr, variance_log = .data$var_log)
+        )
+    } else if (dist_name == "gamma") {
+      weights <- df %>%
+        dplyr::mutate(w_j = (std_popn / sum(std_popn)) * (1 / popn)) %>%
+        dplyr::pull(.data$w_j) %>%
+        list()
+
+      # if user doesn't specify a method, use the default
+      if (is.null(method)) {
+        method <- "tcz06"
+      }
+
+      df_dsr <- df_dsr %>%
+        dplyr::mutate(get_ci_gamma(
+          interval = interval, estimate = .data$dsr, weights = weights,
+          variance = var, method = method
+        ))
+    } else {
+      stop("for a directly standardized rate, `dist` should be one of 'normal', 'log normal', or 'gamma'")
+    }
+
+    # clean output
     df_dsr <- df_dsr %>%
-      dplyr::mutate(
-        get_ci(dist = dist, interval = interval, estimate = .data$dsr, variance = var),
-        interval = interval
-      ) %>%
-      dplyr::select(.data$dsr, .data$lower, .data$upper, interval) %>%
-      dplyr::mutate(dplyr::across(.cols = c(.data$lower, .data$upper), ~ .x * multiplier)) # apply multiplier to lower and upper bounds
+      dplyr::mutate(interval = interval) %>%
+      dplyr::select(.data$dsr, .data$lower, .data$upper, .data$interval) %>%
+      dplyr::mutate(dplyr::across(.cols = c(.data$lower, .data$upper), ~ .x * multiplier)) # apply multiplier to lower and upper limits
   }
 
   # apply multiplier to rate
@@ -224,7 +294,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
     if ("interval" %in% colnames(df_dsr)) {
       result <- df_dsr
     } else {
-      result <- df_dsr$dsr # confidence internal not constructed
+      result <- df_dsr$dsr # confidence interval not calculated
     }
   } else {
     result <- df$exp_counts
@@ -241,7 +311,7 @@ get_ds_rt <- function(counts, popn, std_popn, scale = NULL, power = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' df <- tibble::tibble(counts, popn, std_popn) %>%
+#' df <- data.frame(counts, popn, std_popn) %>%
 #'   dplyr::mutate(
 #'     spec_rt = get_spec_rt(counts, popn),
 #'     exp_counts = spec_rt * std_popn

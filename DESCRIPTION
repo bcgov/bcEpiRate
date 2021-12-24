@@ -1,7 +1,7 @@
 Package: bcEpiRate
 Title: Tools for Standardized Rates in Population Health Surveillance and Epidemiology
-Version: 0.1.0
-Date: 2021-10-15
+Version: 1.0.0
+Date: 2021-12-24
 Authors@R: 
     c(person(given = "Reiko",
              family = "Okamoto",

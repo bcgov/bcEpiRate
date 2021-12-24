@@ -17,7 +17,7 @@ Calculate the variance for a directly standardized rate
 }
 \examples{
 \dontrun{
-df <- tibble::tibble(counts, popn, std_popn) \%>\%
+df <- data.frame(counts, popn, std_popn) \%>\%
   dplyr::mutate(
     spec_rt = get_spec_rt(counts, popn),
     exp_counts = spec_rt * std_popn

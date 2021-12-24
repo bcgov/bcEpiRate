@@ -28,32 +28,25 @@ applied.}
 as a numeric vector. If \code{TRUE} a data frame containing both the rates and
 the validity of the corresponding elements in the input vectors is returned.}
 
-\item{dist}{A string to indicate the type of probability distribution for the confidence interval to follow.
-Can be one of the following: \code{"normal"}, \code{"log normal"}, or \code{"poisson"}. This parameter is case insensitive.}
+\item{dist}{A string to indicate the type of probability distribution for the
+confidence interval to follow. Can be one of the following: \code{"normal"},
+\code{"log normal"} or \code{"poisson"}. This parameter is case insensitive.}
 
-\item{interval}{A scalar, between 0 and 1, indicating the width of the confidence interval.
-For example, for a 95\% confidence interval, use \code{interval = 0.95}.}
+\item{interval}{A scalar, between 0 and 1, indicating the width of the
+confidence interval. For example, for a 95\% confidence interval, use
+\code{interval = 0.95}.}
 }
 \value{
-If \code{output_status = FALSE} and neither \code{dist} or \code{interval} is supplied, a numeric vector is returned.
+If \code{output_status = FALSE} and neither \code{dist} or \code{interval} is supplied, a
+numeric vector is returned.
 
-Otherwise, a data frame is returned with a column for \code{rate} and up to 4 additional columns:
+Otherwise, a data frame is returned with a column for \code{rate} and up to 4
+additional columns:
 \itemize{
 \item If \code{output_status = TRUE}, then the column \code{status} is included.
-\item If both \code{dist} and \code{interval} are provided, then the columns \code{interval}, \code{lower}, and \code{upper} are also included.
+\item If both \code{dist} and \code{interval} are provided, then the columns \code{interval},
+\code{lower}, and \code{upper} are also included.
 }
-}
-\description{
-Calculate specific rates given a vector containing the frequencies of events
-and a vector containing the sizes of the defined populations.
-Visit \href{https://www.statcan.gc.ca/eng/dai/btd/asr}{Statistics Canada} for more
-information.
-}
-\details{
-This low-level function assumes that counts and sizes of respective
-subpopulations are provided in the same order. It can also be used to
-calculate a crude rate if \code{counts} and \code{popn} are scalars and represent the
-sum of all counts and the size of the entire population respectively.
 
 The \code{status} column of the output can be interpreted as follows:
 \itemize{
@@ -63,16 +56,25 @@ was NA.
 \item \code{"success"} indicates that both the numerator and denominator of the
 fraction were valid numbers.
 }
+}
+\description{
+Calculate specific rates given a vector containing the frequencies of events
+and a vector containing the sizes of the defined populations.
+}
+\details{
+This low-level function assumes that counts and sizes of respective
+subpopulations are provided in the same order. It can also be used to
+calculate a crude rate if \code{counts} and \code{popn} are scalars and represent the
+sum of all counts and the size of the entire population respectively.
 
-To construct confidence intervals for the rate estimates, arguments must be supplied to both \code{dist} and \code{interval}.
-In general, \emph{the normal distribution should not be used to construct confidence intervals when the standard deviation
-is greater than a third of the mean}. The function throws a warning if this is the case.
+To construct confidence intervals for the rate estimates, arguments must be
+explicitly supplied to both \code{dist} and \code{interval}.
 }
 \examples{
 \dontrun{
 # using vectors
-counts <- c(1, 2, 3, 4, 5)
-popn <- c(10, 50, 100, 500, 1000)
+counts <- c(100, 200, 300, 400, 500)
+popn <- c(1000, 5000, 10000, 50000, 100000)
 
 get_spec_rt(counts, popn)
 get_spec_rt(counts, popn, scale = 1000)
@@ -95,4 +97,10 @@ df <- df \%>\%
   dplyr::mutate(spec_rate = get_spec_rt(counts, popn, scale = 1000))
 }
 
+}
+\references{
+\href{http://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_stdrate_details.htm}{The STDRATE Procedure}
+}
+\seealso{
+\code{\link[=get_ci_norm]{get_ci_norm()}}, \code{\link[=get_ci_lnorm]{get_ci_lnorm()}}, \code{\link[=get_ci_pois]{get_ci_pois()}}
 }
