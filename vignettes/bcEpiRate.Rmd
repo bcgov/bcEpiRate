@@ -357,14 +357,12 @@ intervals for 5 different causes of death over 5 years.
 
 ## Example 6: Calculating the standardized mortality ratio for Disease D in 2016
 
-The **standardized mortality ratio (SMR)** is a ratio of the number of
-observed deaths to expected deaths in the study population. The expected
-number of deaths in the study population is calculated by applying the
-standard population's stratum-specific mortality rate or risk to the
-study population. When the ratio is greater than 1, it suggests that
-there is excess mortality in the study population. On the other hand,
-when it is less than 1, it suggests that the number of deaths in the
-study population is fewer than what was expected (5).
+The **standardized mortality ratio (SMR)** is a ratio between the number
+of observed deaths in the study population and the number of expected
+deaths in the standard population. When the ratio is greater than 1, it
+suggests that there is excess mortality in the study population. On the
+other hand, when it is less than 1, it suggests that the number of
+deaths in the study population is fewer than what was expected (5).
 
 To calculate the SMR for Disease D in 2016, we will need the number of
 observed deaths, the size of each age group in the study population, and
