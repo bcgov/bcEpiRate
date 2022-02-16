@@ -1,5 +1,13 @@
 # bcEpiRate
 
+# v1.0.1
+
+### Documentation improvements
+
+-   Clarify ambiguity concerning the definition of SMR in the vignette
+
+-   Change year in LICENSE and CITATION to 2022
+
 # v1.0.0
 
 ### Breaking changes
